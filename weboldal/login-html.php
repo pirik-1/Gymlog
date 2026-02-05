@@ -4,12 +4,11 @@ session_start();
 <!DOCTYPE html>
 <html lang="hu">
 <head>
+    <script src="../js/bejelentkezes.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="img/gymlog-white.png">
-    <script src="bejelentkezes.js"></script>
+    <link rel="stylesheet" href="../css/login.css">
+    <link rel="icon" type="image/x-icon" href="../img/gymlog-white.png">
     <title>Bejelentkezés</title>
 </head>
 <body>
@@ -27,8 +26,11 @@ session_start();
     <span class="mutasdajelszot" id="mutasd">Mutasd a jelszót</span>
     <br><br>
 
-    <button id="login" type="submit" class="gomb">Bejelentkezés</button>
-    <a href="regisztracio.php" class="gomb" id="login">Regisztráció</a>
+    <div class="gombSor">
+    <button type="submit">Bejelentkezés</button>
+    <a href="register-html.php" class="gomb">Regisztráció</a>
+    </div>
+
 
     <br><br>
     <p id="hiba" style="color:red;">

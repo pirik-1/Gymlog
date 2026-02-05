@@ -3,7 +3,7 @@ session_start();
 require "db.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: bejelentkezes.php");
+    header("Location: login-html.php");
     exit;
 }
 
@@ -30,6 +30,6 @@ if ($user && password_verify($jelszo, $user["jelszo"])) {
 }
 
 $_SESSION["hiba"] = "Hibás email vagy jelszó";
-header("Location: bejelentkezes.php");
+header("Location: login-html.php");
 exit;
 

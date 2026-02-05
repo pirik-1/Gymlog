@@ -1,5 +1,5 @@
 body{
-    background-image: url(weboldal/img/hatter3.jpg);
+    background-image: url(../img/hatter3.jpg);
     background-attachment: fixed;  
     background-size: cover;
     color: white;
@@ -240,4 +240,3 @@ h2.alatt{
     opacity: 0.5;
     cursor: default;
 } */
- 

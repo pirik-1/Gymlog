@@ -21,7 +21,7 @@ btn.addEventListener("click", () => {
     const magassag = getNumber("magassag");
     const tomeg = getNumber("tomeg");
 
-    // 🔴 Ellenőrzések
+    // Ellenőrzések
     if (!nem) {
         hiba.style.color = "red";
         hiba.innerText = "Válaszd ki a nemet!";
@@ -48,7 +48,7 @@ btn.addEventListener("click", () => {
         return;
     }
 
-    // ✅ BMR – Mifflin–St Jeor
+    // BMR
     let bmr;
     if (nem === "ferfi") {
         bmr = 10 * tomeg + 6.25 * magassag - 5 * eletkor + 5;
@@ -61,10 +61,10 @@ btn.addEventListener("click", () => {
         bmr += 300;
     }
 
-    // ⚙️ Alap aktivitás (közepes)
+    // Alap aktivitás (közepes)
     const tdee = bmr * 1.55;
 
-    // 🎯 Cél szerinti kalória
+    // Cél szerinti kalória
     let celKaloria = tdee;
     let celNev = "Szintentartás";
 
@@ -76,7 +76,7 @@ btn.addEventListener("click", () => {
         celNev = "Tömegnövelés";
     }
 
-    // ✅ Eredmény
+    // Eredmény
     hiba.style.color = "white";
     hiba.innerHTML = `
         <b>Eredmény</b><br>

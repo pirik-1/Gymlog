@@ -16,12 +16,12 @@
 
 <!-- NAVBAR -->
 <ul>
-    <li><a class="home-btn-a" href="../index.php"><img class="home-btn" src="../img/gymlog-white-removebg.png"></a></li>
-    <li><a href="ujedzes.html">Új edzés</a></li>
-    <li><a href="kozosseg.html">Közösség</a></li>
-    <li><a href="statisztikak.html">Statisztikák</a></li>
-    <li><a href="kalkulator.html">Kalória kalkulátor</a></li>
-    <li><a href="profil.html">Profil</a></li>
+    <li><a class="home-btn-a" href="index.php"><img class="home-btn" src="../img/gymlog-white-removebg.png"></a></li>
+    <li><a href="ujedzes.php">Új edzés</a></li>
+    <li><a href="kozosseg.php">Közösség</a></li>
+    <li><a href="statisztikak.php">Statisztikák</a></li>
+    <li><a href="profil.php">Kalória kalkulátor</a></li>
+    <li><a href="profil.php">Profil</a></li>
     <li class="menu-icon-li"><img src="../img/menu.png" id="menuBtn" class="menu-icon"></li>
 </ul>
 

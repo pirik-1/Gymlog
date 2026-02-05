@@ -3,7 +3,7 @@ session_start();
 require "db.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    header("Location: regisztracio.php");
+    header("Location: register-html.php");
     exit;
 }
 
@@ -15,19 +15,19 @@ $jelszo2 = $_POST["jelszo_ujra"] ?? "";
 // Alap ellenőrzések
 if ($email === "" || $nev === "" || $jelszo1 === "" || $jelszo2 === "") {
     $_SESSION["hiba"] = "Minden mező kitöltése kötelező.";
-    header("Location: regisztracio.php");
+    header("Location: register-html.php");
     exit;
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $_SESSION["hiba"] = "Érvénytelen e-mail cím.";
-    header("Location: regisztracio.php");
+    header("Location: register-html.php");
     exit;
 }
 
 if ($jelszo1 !== $jelszo2) {
     $_SESSION["hiba"] = "A két jelszó nem egyezik.";
-    header("Location: regisztracio.php");
+    header("Location: register-html.php");
     exit;
 }
 
@@ -39,7 +39,7 @@ $exists = $check->get_result()->fetch_assoc();
 
 if ($exists) {
     $_SESSION["hiba"] = "Ezzel az e-mail címmel már létezik fiók.";
-    header("Location: regisztracio.php");
+    header("Location: register-html.php");
     exit;
 }
 
@@ -53,10 +53,10 @@ $stmt->bind_param("sssi", $email, $hash, $nev, $admin);
 
 if ($stmt->execute()) {
     // siker: vissza loginra
-    header("Location: bejelentkezes.php");
+    header("Location: login-html.php");
     exit;
 }
 
 $_SESSION["hiba"] = "Hiba a regisztráció során.";
-header("Location: regisztracio.php");
+header("Location: register-html.php");
 exit;
