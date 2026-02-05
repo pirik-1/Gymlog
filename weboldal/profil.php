@@ -30,64 +30,48 @@
     <li><a href="login-html.php">Kijelentkezés</a></li>
 </ul>
 
-<!-- PROFIL -->
-<div class="profil-container">
+<main class="profil-main">
+    <div class="profil-shell">
 
-    <!-- ADATOK -->
-    <div class="profil-card profil-adatok">
-        <h2>Adatok</h2>
-        <p><b>Név:</b></p>
-        <p><b>E-mail:</b></p>
-        <p><b>Regisztráció:</b></p>
-    </div>
-
-    <!-- STATISZTIKÁK -->
-    <div class="profil-card">
-        <h2>Statisztikák</h2>
-        <div class="stat-grid">
-            <div class="stat-box">
-                <h3>128</h3>
-                <p>Edzés</p>
+        <section class="profil-left">
+            <div class="profil-card profil-basic">
+                <h1>Profil</h1>
+                <p><span class="label">Név:</span> <span class="value">Minta Felhasználó</span></p>
+                <p><span class="label">E‑mail:</span> <span class="value">felhasznalo@example.com</span></p>
+                <p><span class="label">Regisztráció:</span> <span class="value">2025‑01‑01</span></p>
             </div>
-            <div class="stat-box">
-                <h3>412</h3>
-                <p>Óra</p>
+
+            <div class="profil-card profil-stats">
+                <h2>Statisztikák</h2>
+                <div class="profil-stat-grid">
+                    <div class="profil-stat-box">
+                        <div class="number">128</div>
+                        <div class="label">edzés</div>
+                    </div>
+                    <div class="profil-stat-box">
+                        <div class="number">412</div>
+                        <div class="label">óra</div>
+                    </div>
+                    <div class="profil-stat-box">
+                        <div class="number">32</div>
+                        <div class="label">barát</div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-box">
-                <h3>32</h3>
-                <p>Barát</p>
+        </section>
+
+        <aside class="profil-right">
+            <div class="profil-card profil-friends">
+                <h2>Barátok</h2>
+                <ul class="friends-list">
+                    <!-- Ide kerülnek majd dinamikusan a barátok -->
+                </ul>
+                <p class="friends-hint">Itt jelennek meg azok, akiket barátnak jelölsz.</p>
             </div>
-        </div>
+        </aside>
+
     </div>
-
-    <!-- BARÁTOK -->
-    <div class="profil-card profil-full">
-        <h2>Barátok</h2>
-
-        <div class="barat">
-            <span></span>
-            <button>Profil</button>
-        </div>
-
-        <div class="barat">
-            <span></span>
-            <button>Profil</button>
-        </div>
-
-        <div class="barat">
-            <span></span>
-            <button>Profil</button>
-        </div>
-    </div>
-
-    <div class="kaloria-card">
-        <h2>Kalória kalkulátor</h2>
-        <p><b>Név:</b></p>
-        <p><b>E-mail:</b></p>
-        <p><b>Regisztráció:</b></p>
-    </div>
-
-</div>
+</main>
 
 </body>
 </html>

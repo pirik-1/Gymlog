@@ -1,93 +1,112 @@
-    body{    
-        background-image: url(../img/moonlit-asteroid.jpg);
-        background-attachment: fixed;  
-        background-size: cover;
-        color: white;
-    }
+/* ===== Profil oldal – kompakt, minimalista elrendezés ===== */
 
-    .profil-container{
-        max-width: 1100px;
-        margin: 4% auto;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    }
+.profil-main{
+    max-width: 960px;
+    margin: 40px auto;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
 
-    .profil-card{
-        border-radius: 30px;
-        padding: 25px;
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        background-color: rgba(255, 255, 255, 0.12);
-        border: 2px solid rgba(255, 255, 255, 0.25);
-    }
+.profil-shell{
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    box-sizing: border-box;
+    background: transparent; /* ne legyen külön, lelógó sötét csík a két oszlop mögött */
+}
 
-    .profil-card h2{
-        text-align: center;
-        margin-bottom: 20px;
-    }
+.profil-left{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
-    .profil-adatok p{
-        font-size: 18px;
-        margin: 10px 0;
-    }
+.profil-right{
+    display: flex;
+    align-items: flex-start; /* a barátok-kártya ne nyúljon le a teljes magasságig */
+}
 
-    .stat-grid{
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        text-align: center;
-    }
+.profil-card{
+    border-radius: 24px;
+    padding: 18px 20px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background-color: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-sizing: border-box;
+}
 
-    .stat-box{
-        padding: 15px;
-        border-radius: 20px;
-        background: rgba(255,255,255,0.15);
-    }
+.profil-basic h1{
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 26px;
+}
 
-    .stat-box h3{
-        font-size: 26px;
-        margin-bottom: 5px;
-    }
+.profil-basic p{
+    margin: 6px 0;
+    font-size: 15px;
+}
 
-    .barat{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        border-radius: 15px;
-        background: rgba(255,255,255,0.15);
-        margin-bottom: 10px;
-    }
+.profil-basic .label{
+    font-weight: 600;
+    margin-right: 4px;
+}
 
-    .barat span{
-        font-size: 18px;
-    }
+.profil-basic .value{
+    opacity: 0.9;
+}
 
-    .barat button{
-        border: none;
-        border-radius: 10px;
-        padding: 5px 10px;
-        background: rgba(255,255,255,0.3);
-        color: white;
-        cursor: pointer;
-    }
+.profil-stats h2,
+.profil-friends h2{
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 20px;
+}
 
-    .profil-full{
-        grid-column: span 2;
-    }
+.profil-stat-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
 
-    .kaloria-card{
-        border-radius: 30px;
-        padding: 25px;
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        background-color: rgba(255, 255, 255, 0.12);
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        grid-column: span 2;      /* foglalja el mindkét oszlopot */
-        max-width: 500px;         /* ne legyen túl széles */
-        margin: 0 auto;           /* vízszintesen középre */
-        text-align: center;       /* tartalom középre igazítása */
+.profil-stat-box{
+    border-radius: 16px;
+    background: rgba(255,255,255,0.12);
+    text-align: center;
+    padding: 10px 8px;
+}
 
-    }
+.profil-stat-box .number{
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.profil-stat-box .label{
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.profil-friends{
+    width: 100%;
+}
+
+.friends-list{
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px;
+}
+
+.friends-list li{
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    font-size: 14px;
+}
+
+.friends-list li:last-child{
+    border-bottom: none;
+}
+
+.friends-hint{
+    font-size: 12px;
+    opacity: 0.8;
+    margin: 0;
+}
