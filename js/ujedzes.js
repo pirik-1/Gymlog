@@ -99,17 +99,125 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Egyszerű validáció a "mentésnél"
-    mentesGomb.addEventListener("click", () => {
+    // Mentés: validáció + elküldés a szervernek
+    mentesGomb.addEventListener("click", async () => {
         hiba.style.color = "red";
+
         const db = valasztottWrap.querySelectorAll(".edzes-sor").length;
         if (db === 0) {
             hiba.textContent = "Adj hozzá legalább egy gyakorlatot!";
             return;
         }
-        hiba.style.color = "white";
-        hiba.textContent = "A mentés logikája később kerül kialakításra. A felépítés rendben van.";
+
+        const edzesNevInput = document.getElementById("edzesNev");
+        const edzesNev = edzesNevInput ? edzesNevInput.value.trim() : "";
+
+        if (!edzesNev) {
+            hiba.textContent = "Adj nevet az edzésnek!";
+            return;
+        }
+
+        const sorok = Array.from(valasztottWrap.querySelectorAll(".edzes-sor")).map((sor) => {
+            const nevElem = sor.querySelector(".gyakorlat-nev");
+            const setInput = sor.querySelector(".set-input");
+            const repInput = sor.querySelector(".rep-input");
+            const sulyInput = sor.querySelector(".suly-input");
+
+            return {
+                nev: nevElem ? nevElem.textContent.trim() : "",
+                set: setInput ? Number(setInput.value) || 0 : 0,
+                rep: repInput ? Number(repInput.value) || 0 : 0,
+                suly: sulyInput ? Number(sulyInput.value) || 0 : 0,
+            };
+        });
+
+        try {
+            hiba.style.color = "white";
+            hiba.textContent = "Mentés folyamatban...";
+
+            const response = await fetch("mentes_edzesterv.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    nev: edzesNev,
+                    sorok: sorok,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data && data.siker) {
+                hiba.style.color = "lightgreen";
+                hiba.textContent = data.uzenet || "Edzésterv sikeresen elmentve.";
+            } else {
+                hiba.style.color = "red";
+                hiba.textContent = (data && data.uzenet) ? data.uzenet : "Hiba történt a mentés közben.";
+            }
+        } catch (e) {
+            console.error(e);
+            hiba.style.color = "red";
+            hiba.textContent = "Nem sikerült kapcsolódni a szerverhez.";
+        }
     });
+
+    // Terv betöltése, ha van URL paraméter
+    function tervBetoltese() {
+        if (!window.tervAdatok) {
+            return;
+        }
+
+        const adatok = window.tervAdatok;
+        const edzesNevInput = document.getElementById("edzesNev");
+        
+        if (edzesNevInput && adatok.nev) {
+            edzesNevInput.value = adatok.nev;
+        }
+
+        if (adatok.tartalom && Array.isArray(adatok.tartalom) && adatok.tartalom.length > 0) {
+            // Távolítsuk el az üres szöveget
+            const ures = valasztottWrap.querySelector(".ures-info");
+            if (ures) {
+                ures.remove();
+            }
+
+            // Töröljük a meglévő sorokat (ha vannak)
+            valasztottWrap.querySelectorAll(".edzes-sor").forEach(sor => sor.remove());
+
+            // Hozzáadjuk az új sorokat
+            adatok.tartalom.forEach((sor) => {
+                const nev = sor.nev || "";
+                const set = sor.set || 3;
+                const rep = sor.rep || 8;
+                const suly = sor.suly || 0;
+
+                if (!nev) return;
+
+                const sorElem = document.createElement("div");
+                sorElem.className = "edzes-sor";
+                sorElem.innerHTML = `
+                    <span class="gyakorlat-nev">${nev}</span>
+                    <label>Set:
+                        <input type="number" class="set-input" min="1" max="10" value="${set}">
+                    </label>
+                    <label>Rep:
+                        <input type="number" class="rep-input" min="1" max="30" value="${rep}">
+                    </label>
+                    <label>Súly (kg):
+                        <input type="number" class="suly-input" min="0" max="500" value="${suly}">
+                    </label>
+                    <button type="button" class="sor-torles">✕</button>
+                `;
+                valasztottWrap.appendChild(sorElem);
+            });
+
+            frissitDarab();
+        }
+    }
+
+    // Betöltjük a tervet, ha van
+    tervBetoltese();
 
     frissitDarab();
 });

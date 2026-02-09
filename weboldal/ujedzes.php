@@ -1,3 +1,31 @@
+<?php
+session_start();
+require "db.php";
+
+$tervAdatok = null;
+if (isset($_GET["terv_id"]) && is_numeric($_GET["terv_id"])) {
+    $tervId = (int)$_GET["terv_id"];
+    $userId = isset($_SESSION["user_id"]) ? (int)$_SESSION["user_id"] : 0;
+    
+    if ($userId > 0) {
+        $check = $conn->query("SHOW TABLES LIKE 'edzesterv_mentes'");
+        if ($check && $check->num_rows > 0) {
+            $stmt = $conn->prepare("SELECT nev, tartalom FROM edzesterv_mentes WHERE id = ? AND felhasznaloId = ?");
+            if ($stmt) {
+                $stmt->bind_param("ii", $tervId, $userId);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($row = $result->fetch_assoc()) {
+                    $tervAdatok = [
+                        "nev" => $row["nev"],
+                        "tartalom" => json_decode($row["tartalom"], true) ?: []
+                    ];
+                }
+            }
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +36,11 @@
     <link rel="icon" type="image/x-icon" href="../img/gymlog-white.png">
     <script src="../js/index.js" defer></script>
     <script src="../js/ujedzes.js" defer></script>
+    <?php if ($tervAdatok): ?>
+    <script>
+        window.tervAdatok = <?php echo json_encode($tervAdatok, JSON_UNESCAPED_UNICODE); ?>;
+    </script>
+    <?php endif; ?>
     
     <title>Új edzés</title>
 </head>
@@ -24,6 +57,7 @@
         <li><a class="home-btn-a" href="index.php"><img class="home-btn" src="../img/gymlog-white-removebg.png"></a></li>
         <li><a href="index.php">Főoldal</a></li>
         <li><a href="ujedzes.php">Új edzés</a></li>
+        <li><a href="edzestervek.php">Edzéstervek</a></li>
         <li><a href="kozosseg.php">Közösség</a></li>
         <li><a href="statisztikak.php">Statisztikák</a></li>
         <li><a href="profil.php">Profil</a></li>
