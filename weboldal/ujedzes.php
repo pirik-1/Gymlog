@@ -3,6 +3,7 @@ session_start();
 require "db.php";
 require "functions.php";
 
+$gyakorlatok = getOsszesGyakorlat($conn);
 $tervAdatok = null;
 if (isset($_GET["terv_id"]) && is_numeric($_GET["terv_id"])) {
     $tervId = (int)$_GET["terv_id"];
@@ -75,12 +76,9 @@ if (isset($_GET["terv_id"]) && is_numeric($_GET["terv_id"])) {
         <input type="text" id="gyakorlatKereses" class="gyakorlat-kereses" placeholder="Keresés a gyakorlatok között...">
 
         <div class="gyakorlat-panel-lista" id="gyakorlatListaOldal">
-            <button type="button" class="gyakorlat-item" data-nev="Fekvenyomás">Fekvenyomás (mell)</button>
-            <button type="button" class="gyakorlat-item" data-nev="Guggolás">Guggolás (láb)</button>
-            <button type="button" class="gyakorlat-item" data-nev="Felhúzás">Felhúzás (hát)</button>
-            <button type="button" class="gyakorlat-item" data-nev="Vállból nyomás">Vállból nyomás (váll)</button>
-            <button type="button" class="gyakorlat-item" data-nev="Bicepsz hajlítás">Bicepsz hajlítás</button>
-            <button type="button" class="gyakorlat-item" data-nev="Tricepsz letolás">Tricepsz letolás</button>
+            <?php foreach ($gyakorlatok as $g): ?>
+            <button type="button" class="gyakorlat-item" data-nev="<?php echo htmlspecialchars($g); ?>"><?php echo htmlspecialchars($g); ?></button>
+            <?php endforeach; ?>
         </div>
     </div>
 </body>

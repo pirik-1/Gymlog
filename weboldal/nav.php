@@ -16,6 +16,7 @@ $roleSzoveg = [
     <li><a href="ujedzes.php">Új edzés</a></li>
     <li><a href="edzestervek.php">Edzéstervek</a></li>
     <li><a href="kozosseg.php">Közösség</a></li>
+    <li><a href="edzes_ajanlas.php"><?php echo ($role ?? '') === 'admin' ? 'Jóváhagyás' : 'Gyakorlat beajánlás'; ?></a></li>
     <li><a href="profil.php">Profil</a></li>
     <li class="nav-spacer"></li>
     <li class="nav-role"><?php echo htmlspecialchars($roleSzoveg); ?></li>

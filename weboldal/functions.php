@@ -97,6 +97,95 @@ function getPosztok($conn, $limit = 50, $userId = null, $csakBaratok = false) {
     return $posztok;
 }
 
+function ensureGyakorlatAjanlasTable($conn) {
+    $conn->query("CREATE TABLE IF NOT EXISTS gyakorlat_ajanlas (
+        id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        felhasznalo_id INT(11) NOT NULL,
+        nev VARCHAR(100) NOT NULL,
+        status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+        datum DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+}
+
+function gyakorlatAjanlasBeszuras($conn, $userId, $nev) {
+    ensureGyakorlatAjanlasTable($conn);
+    $stmt = $conn->prepare("INSERT INTO gyakorlat_ajanlas (felhasznalo_id, nev) VALUES (?, ?)");
+    if (!$stmt) return false;
+    $stmt->bind_param("is", $userId, $nev);
+    return $stmt->execute();
+}
+
+function getSajatGyakorlatAjanlasok($conn, $userId) {
+    $lista = [];
+    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
+    if (!$check || $check->num_rows === 0) return $lista;
+    $stmt = $conn->prepare("SELECT id, nev, status, datum FROM gyakorlat_ajanlas WHERE felhasznalo_id = ? ORDER BY datum DESC");
+    if (!$stmt) return $lista;
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) $lista[] = $row;
+    return $lista;
+}
+
+function getFuggoGyakorlatAjanlasok($conn) {
+    $lista = [];
+    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
+    if (!$check || $check->num_rows === 0) return $lista;
+    $res = $conn->query("SELECT a.id, a.nev, a.datum, f.nev as felhasznalo_nev FROM gyakorlat_ajanlas a JOIN felhasznalo f ON f.id = a.felhasznalo_id WHERE a.status = 'pending' ORDER BY a.datum ASC");
+    if (!$res) return $lista;
+    while ($row = $res->fetch_assoc()) $lista[] = $row;
+    return $lista;
+}
+
+function gyakorlatAjanlasStatusModosit($conn, $ajanlasId, $status, $isAdmin) {
+    if (!$isAdmin || !in_array($status, ['approved', 'rejected'])) return false;
+    $stmt = $conn->prepare("UPDATE gyakorlat_ajanlas SET status = ? WHERE id = ?");
+    if (!$stmt) return false;
+    $stmt->bind_param("si", $status, $ajanlasId);
+    return $stmt->execute();
+}
+
+function getJovahagyottGyakorlatok($conn) {
+    $lista = [];
+    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
+    if (!$check || $check->num_rows === 0) return $lista;
+    $res = $conn->query("SELECT DISTINCT nev FROM gyakorlat_ajanlas WHERE status = 'approved' ORDER BY nev");
+    if (!$res) return $lista;
+    while ($row = $res->fetch_assoc()) $lista[] = $row["nev"];
+    return $lista;
+}
+
+function getJovahagyottAjanlasokLista($conn) {
+    $lista = [];
+    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
+    if (!$check || $check->num_rows === 0) return $lista;
+    $res = $conn->query("SELECT a.id, a.nev, a.datum, f.nev as felhasznalo_nev FROM gyakorlat_ajanlas a JOIN felhasznalo f ON f.id = a.felhasznalo_id WHERE a.status = 'approved' ORDER BY a.nev, a.datum");
+    if (!$res) return $lista;
+    while ($row = $res->fetch_assoc()) $lista[] = $row;
+    return $lista;
+}
+
+function getOsszesGyakorlat($conn) {
+    $alap = [
+        "Arnold press", "Bicepsz curl", "Bicepsz hajlítás", "Calf emelés állva",
+        "Calf emelés ülve", "Döntött pad fekvenyomás", "Döntött pad mellhúzás",
+        "Egykezes sor", "Fej fölé nyomás", "Fekvenyomás", "Fekvenyomás szűk fogással",
+        "Felhúzás", "Felhúzás román", "Francia nyomás", "Guggolás", "Guggolás törzselés",
+        "Hamstring curl", "Hatcsípő gépen", "Húzódzkodás", "Kalapács hajlítás",
+        "Kézi súlyzós vállból nyomás", "Lábemelés", "Lefekvő lenyomás",
+        "Légtorna", "Mellgépen fekvés", "Oldalemelés", "Preacher curl",
+        "Reverse grip sor", "Rudat evezés", "Scott pad", "Shrug",
+        "Szűk fogású fekvenyomás", "Tolódzkodás", "Tricepsz letolás",
+        "Tricepsz kickback", "Vállból nyomás", "Vállból nyomás ülve",
+        "Vállemelés", "Vízesés", "W sit-up"
+    ];
+    $jovahagyott = getJovahagyottGyakorlatok($conn);
+    $osszes = array_unique(array_merge($alap, $jovahagyott));
+    sort($osszes, SORT_LOCALE_STRING);
+    return $osszes;
+}
+
 function ensureBaratsagTable($conn) {
     $conn->query("CREATE TABLE IF NOT EXISTS baratsag (
         id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
