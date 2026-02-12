@@ -28,10 +28,18 @@ $userId = (int)$_SESSION["user_id"];
 $datum = date("Y-m-d");
 $osszsuly = 0;
 foreach ($sorok as $s) {
-    $set = (int)($s["set"] ?? 0);
-    $rep = (int)($s["rep"] ?? 0);
-    $suly = (int)($s["suly"] ?? 0);
-    $osszsuly += $set * $rep * $suly;
+    if (isset($s["szettek"]) && is_array($s["szettek"])) {
+        foreach ($s["szettek"] as $sz) {
+            $rep = (int)($sz["rep"] ?? 0);
+            $suly = (int)($sz["suly"] ?? 0);
+            $osszsuly += $rep * $suly;
+        }
+    } else {
+        $set = (int)($s["set"] ?? 0);
+        $rep = (int)($s["rep"] ?? 0);
+        $suly = (int)($s["suly"] ?? 0);
+        $osszsuly += $set * $rep * $suly;
+    }
 }
 $leiras = json_encode($sorok, JSON_UNESCAPED_UNICODE);
 

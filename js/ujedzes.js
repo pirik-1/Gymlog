@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Gyakorlat számláló frissítése
     function frissitDarab() {
-        const db = elemek.valasztottWrap.querySelectorAll(".edzes-sor").length;
+        const db = elemek.valasztottWrap.querySelectorAll(".edzes-blokk").length;
         elemek.gyCount.textContent = db + " gyakorlat";
         if (db === 0 && !elemek.valasztottWrap.querySelector(".ures-info")) {
             const p = document.createElement("p");
@@ -65,26 +65,57 @@ document.addEventListener("DOMContentLoaded", () => {
     function panelNyit() { elemek.panel.classList.add("open"); }
     function panelCsuk() { elemek.panel.classList.remove("open"); }
 
-    // Gyakorlat sor létrehozása
-    function gyakorlatSorLetrehozasa(nev, set = 3, rep = 8, suly = 0) {
-        const sor = document.createElement("div");
-        sor.className = "edzes-sor";
-        sor.innerHTML = `
-            <span class="gyakorlat-nev">${nev}</span>
-            <label>Set: <input type="number" class="set-input" min="1" max="10" value="${set}"></label>
-            <label>Rep: <input type="number" class="rep-input" min="1" max="30" value="${rep}"></label>
+    // Egy szett sor létrehozása
+    function szetSorLetrehozasa(rep = 8, suly = 0, index = 1) {
+        const div = document.createElement("div");
+        div.className = "szet-sor";
+        div.innerHTML = `
+            <span class="szet-cimke">${index}.</span>
+            <label>Ismétlés: <input type="number" class="rep-input" min="1" max="99" value="${rep}"></label>
             <label>Súly (kg): <input type="number" class="suly-input" min="0" max="500" value="${suly}"></label>
-            <button type="button" class="sor-torles">✕</button>
+            <button type="button" class="szet-torles" title="Szett törlése">−</button>
         `;
-        return sor;
+        return div;
+    }
+
+    // Gyakorlat blokk létrehozása (név + szettek lista)
+    function gyakorlatBlokkLetrehozasa(nev, szettek = [{ rep: 8, suly: 0 }]) {
+        if (!Array.isArray(szettek) || szettek.length === 0) szettek = [{ rep: 8, suly: 0 }];
+        const blokk = document.createElement("div");
+        blokk.className = "edzes-blokk";
+        blokk.innerHTML = `
+            <div class="edzes-blokk-fej">
+                <span class="gyakorlat-nev">${nev}</span>
+                <div class="edzes-blokk-gombok">
+                    <button type="button" class="szet-hozzaad" title="Szett hozzáadása">+</button>
+                    <button type="button" class="sor-torles">✕</button>
+                </div>
+            </div>
+            <div class="szettek-lista"></div>
+        `;
+        const lista = blokk.querySelector(".szettek-lista");
+        szettek.forEach((sz, i) => {
+            lista.appendChild(szetSorLetrehozasa(sz.rep ?? 8, sz.suly ?? 0, i + 1));
+        });
+        szetCimkekFrissit(lista);
+        return blokk;
+    }
+
+    function szetCimkekFrissit(lista) {
+        lista.querySelectorAll(".szet-sor").forEach((s, i) => {
+            const cimke = s.querySelector(".szet-cimke");
+            if (cimke) cimke.textContent = (i + 1) + ".";
+            const torles = s.querySelector(".szet-torles");
+            if (torles) torles.style.visibility = lista.children.length > 1 ? "visible" : "hidden";
+        });
     }
 
     // Event listener-ek
     elemek.ujGyakGomb.addEventListener("click", panelNyit);
     elemek.panelZar.addEventListener("click", panelCsuk);
 
-    // Gyakorlat hozzáadása
-    elemek.panelLista.addEventListener("click", (e) => {
+    // Gyakorlat hozzáadása – legutóbbi adatok betöltése ha van
+    elemek.panelLista.addEventListener("click", async (e) => {
         if (!e.target.classList.contains("gyakorlat-item")) return;
         const nev = e.target.getAttribute("data-nev") || e.target.textContent.trim();
         if (!nev) return;
@@ -92,18 +123,48 @@ document.addEventListener("DOMContentLoaded", () => {
         const ures = elemek.valasztottWrap.querySelector(".ures-info");
         if (ures) ures.remove();
 
-        elemek.valasztottWrap.appendChild(gyakorlatSorLetrehozasa(nev));
+        let szettek = [{ rep: 8, suly: 0 }];
+        if (!window.vendeg) {
+            try {
+                const response = await fetch("gyakorlat_utolso_adat.php?gyakorlat_nev=" + encodeURIComponent(nev));
+                const data = await response.json();
+                if (data?.siker && Array.isArray(data.szettek) && data.szettek.length > 0) {
+                    szettek = data.szettek;
+                }
+            } catch (err) {
+                /* marad az alapértelmezett */
+            }
+        }
+        elemek.valasztottWrap.appendChild(gyakorlatBlokkLetrehozasa(nev, szettek));
         frissitDarab();
         panelCsuk();
     });
 
-    // Sor törlése
+    // Delegált eseménykezelők: blokk törlése, szett hozzáadás/törlés
     elemek.valasztottWrap.addEventListener("click", (e) => {
-        if (!e.target.classList.contains("sor-torles")) return;
-        const sor = e.target.closest(".edzes-sor");
-        if (sor) {
-            sor.remove();
-            frissitDarab();
+        if (e.target.classList.contains("sor-torles")) {
+            const blokk = e.target.closest(".edzes-blokk");
+            if (blokk) {
+                blokk.remove();
+                frissitDarab();
+            }
+        } else if (e.target.classList.contains("szet-hozzaad")) {
+            const blokk = e.target.closest(".edzes-blokk");
+            const lista = blokk?.querySelector(".szettek-lista");
+            if (lista) {
+                const utolso = lista.querySelector(".szet-sor:last-child");
+                const rep = utolso ? Number(utolso.querySelector(".rep-input")?.value) || 8 : 8;
+                const suly = utolso ? Number(utolso.querySelector(".suly-input")?.value) || 0 : 0;
+                lista.appendChild(szetSorLetrehozasa(rep, suly, lista.children.length + 1));
+                szetCimkekFrissit(lista);
+            }
+        } else if (e.target.classList.contains("szet-torles")) {
+            const sor = e.target.closest(".szet-sor");
+            const lista = sor?.closest(".szettek-lista");
+            if (lista && lista.children.length > 1) {
+                sor.remove();
+                szetCimkekFrissit(lista);
+            }
         }
     });
 
@@ -115,14 +176,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Sorok adatainak összegyűjtése
+    // Sorok adatainak összegyűjtése (új formátum: nev + szettek)
     function sorokOsszegyujtese() {
-        return Array.from(elemek.valasztottWrap.querySelectorAll(".edzes-sor")).map((sor) => ({
-            nev: sor.querySelector(".gyakorlat-nev")?.textContent.trim() || "",
-            set: Number(sor.querySelector(".set-input")?.value) || 0,
-            rep: Number(sor.querySelector(".rep-input")?.value) || 0,
-            suly: Number(sor.querySelector(".suly-input")?.value) || 0
-        }));
+        return Array.from(elemek.valasztottWrap.querySelectorAll(".edzes-blokk")).map((blokk) => {
+            const nev = blokk.querySelector(".gyakorlat-nev")?.textContent.trim() || "";
+            const szetSorok = blokk.querySelectorAll(".szettek-lista .szet-sor");
+            const szettek = Array.from(szetSorok).map((s) => ({
+                rep: Number(s.querySelector(".rep-input")?.value) || 0,
+                suly: Number(s.querySelector(".suly-input")?.value) || 0
+            }));
+            return { nev, szettek };
+        });
     }
 
     // Indít gomb
@@ -234,7 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Terv betöltése
+    // Terv betöltése (támogatja a régi és az új formátumot)
     function tervBetoltese() {
         if (!window.tervAdatok) return;
 
@@ -248,16 +312,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const ures = elemek.valasztottWrap.querySelector(".ures-info");
             if (ures) ures.remove();
 
-            elemek.valasztottWrap.querySelectorAll(".edzes-sor").forEach(s => s.remove());
+            elemek.valasztottWrap.querySelectorAll(".edzes-blokk").forEach(b => b.remove());
             sorok.forEach(sor => {
-                if (sor.nev) {
-                    elemek.valasztottWrap.appendChild(gyakorlatSorLetrehozasa(
-                        sor.nev,
-                        sor.set || 3,
-                        sor.rep || 8,
-                        sor.suly || 0
-                    ));
+                if (!sor.nev) return;
+                let szettek;
+                if (Array.isArray(sor.szettek) && sor.szettek.length > 0) {
+                    szettek = sor.szettek;
+                } else {
+                    const set = sor.set || 3, rep = sor.rep || 8, suly = sor.suly || 0;
+                    szettek = Array.from({ length: set }, () => ({ rep, suly }));
                 }
+                elemek.valasztottWrap.appendChild(gyakorlatBlokkLetrehozasa(sor.nev, szettek));
             });
             frissitDarab();
         }

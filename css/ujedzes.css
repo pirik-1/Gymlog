@@ -153,27 +153,85 @@
     text-align: center;
 }
 
-/* Egy sor a listában (gyakorlat + set/rep/kg + X) */
+/* Gyakorlat blokk (név + szettek lista) */
 
-.edzes-sor {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto auto 32px;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 8px;
+.edzes-blokk {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
-.edzes-sor .gyakorlat-nev {
+.edzes-blokk-fej {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.edzes-blokk .gyakorlat-nev {
     font-weight: 600;
     text-align: left;
+    min-width: 0;
+    overflow: hidden;
+    word-break: break-word;
 }
 
-.edzes-sor label {
+.edzes-blokk-gombok {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.edzes-blokk .szet-hozzaad,
+.edzes-blokk .sor-torles {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.5);
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edzes-blokk .szet-hozzaad {
+    background: rgba(110, 181, 255, 0.25);
+}
+
+.szettek-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.szet-sor {
+    display: grid;
+    grid-template-columns: 28px auto auto 28px;
+    gap: 10px;
+    align-items: center;
+}
+
+.szet-sor .szet-cimke {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.szet-sor label {
     font-size: 13px;
 }
 
-.edzes-sor input[type="number"] {
-    width: 80px;
+.szet-sor input[type="number"] {
+    width: 50px;
     padding: 4px 8px;
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.5);
@@ -183,24 +241,21 @@
     box-sizing: border-box;
 }
 
-/* Kis X törlés gomb */
-
-.edzes-sor .sor-torles {
+.szet-sor .szet-torles {
     width: 24px;
     height: 24px;
     min-width: 24px;
     min-height: 24px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.5);
+    padding: 0;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.4);
     background: transparent;
     color: white;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
-    justify-self: center;
 }
 
 /* Gombok alul */
@@ -235,18 +290,24 @@
     box-shadow: none;
 }
 
-/* sor-torles ne örökölje a fő gomb stílusokat */
-.gyakorlat-lista .edzes-sor .sor-torles {
-    min-width: 24px;
-    width: 24px;
-    height: 24px;
+/* sor-torles/szet-hozzaad ne örökölje a fő gomb stílusokat */
+.gyakorlat-lista .edzes-blokk .sor-torles,
+.gyakorlat-lista .edzes-blokk .szet-hozzaad,
+.gyakorlat-lista .edzes-blokk .szet-torles {
     margin-top: 0;
+    transform: none;
+}
+.gyakorlat-lista .edzes-blokk .sor-torles:hover,
+.gyakorlat-lista .edzes-blokk .szet-hozzaad:hover,
+.gyakorlat-lista .edzes-blokk .szet-torles:hover {
+    transform: none;
 }
 
 /* Hibaüzenet */
 
 #hiba {
     color: red;
+    text-align: center;
 }
 
 /* Jobb oldali gyakorlat-választó panel – ugyanaz a fekete, üveges stílus */

@@ -197,15 +197,24 @@ function getProfilStat($conn, $userId, $tipus) {
 }
 
 function formatGyakorlatReszletek($sor) {
+    if (isset($sor["szettek"]) && is_array($sor["szettek"])) {
+        $reszletek = [];
+        foreach ($sor["szettek"] as $i => $sz) {
+            $rep = (int)($sz["rep"] ?? 0);
+            $suly = (int)($sz["suly"] ?? 0);
+            $txt = $rep > 0 ? $rep . " ismétlés" : "";
+            if ($suly > 0) $txt .= ($txt ? " / " : "") . $suly . " kg";
+            if ($txt) $reszletek[] = ($i + 1) . ". " . $txt;
+        }
+        return !empty($reszletek) ? " – " . implode(", ", $reszletek) : "";
+    }
     $set = isset($sor["set"]) ? (int)$sor["set"] : 0;
     $rep = isset($sor["rep"]) ? (int)$sor["rep"] : 0;
     $suly = isset($sor["suly"]) ? (int)$sor["suly"] : 0;
-    
     $reszletek = [];
     if ($set > 0)  $reszletek[] = $set . "x";
     if ($rep > 0)  $reszletek[] = $rep . " ismétlés";
     if ($suly > 0) $reszletek[] = $suly . " kg";
-    
     return !empty($reszletek) ? " – " . implode(", ", $reszletek) : "";
 }
 ?>
