@@ -16,7 +16,6 @@ $roleSzoveg = [
     <li><a href="ujedzes.php">Új edzés</a></li>
     <li><a href="edzestervek.php">Edzéstervek</a></li>
     <li><a href="kozosseg.php">Közösség</a></li>
-    <li><a href="statisztikak.php">Statisztikák</a></li>
     <li><a href="profil.php">Profil</a></li>
     <li class="nav-spacer"></li>
     <li class="nav-role"><?php echo htmlspecialchars($roleSzoveg); ?></li>

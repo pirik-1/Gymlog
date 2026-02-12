@@ -58,7 +58,10 @@ $tervek = $bejelentkezve ? getTervek($conn, $userId) : [];
                             <?php else: ?>
                                 <p>Nincsenek gyakorlatok mentve ehhez a tervhez.</p>
                             <?php endif; ?>
-                            <a href="ujedzes.php?terv_id=<?php echo (int)$terv["id"]; ?>" class="terv-inditas-gomb">Terv indítása</a>
+                            <div class="terv-kartya-gombok">
+                                <a href="ujedzes.php?terv_id=<?php echo (int)$terv["id"]; ?>" class="terv-inditas-gomb">Terv indítása</a>
+                                <button type="button" class="terv-torles-gomb" data-terv-id="<?php echo (int)$terv["id"]; ?>" title="Terv törlése">Törlés</button>
+                            </div>
                         </article>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -73,6 +76,36 @@ $tervek = $bejelentkezve ? getTervek($conn, $userId) : [];
             </aside>
         </div>
     </main>
+
+    <?php if ($bejelentkezve && !empty($tervek)): ?>
+    <script>
+        document.querySelectorAll(".terv-torles-gomb").forEach(btn => {
+            btn.addEventListener("click", async function() {
+                if (!confirm("Biztosan törlöd ezt az edzéstervet?")) return;
+                const tervId = this.getAttribute("data-terv-id");
+                const kartya = this.closest(".terv-kartya");
+                try {
+                    const res = await fetch("terv_torles.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ terv_id: parseInt(tervId, 10) })
+                    });
+                    const data = await res.json();
+                    if (data.siker) {
+                        kartya.remove();
+                        if (!document.querySelector(".terv-kartya")) {
+                            location.reload();
+                        }
+                    } else {
+                        alert(data.uzenet || "Hiba történt.");
+                    }
+                } catch (e) {
+                    alert("Nem sikerült kapcsolódni a szerverhez.");
+                }
+            });
+        });
+    </script>
+    <?php endif; ?>
 </body>
 </html>
 
