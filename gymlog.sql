@@ -144,25 +144,6 @@ CREATE TABLE `sorozat` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `jelszo_reset`
---
-
-CREATE TABLE `jelszo_reset` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `token` varchar(64) NOT NULL,
-  `felhasznalo_id` int(11) NOT NULL,
-  `lejarat` datetime NOT NULL,
-  `hasznalva` tinyint(1) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `token` (`token`),
-  KEY `idx_token` (`token`),
-  KEY `idx_lejarat` (`lejarat`),
-  KEY `felhasznalo_id` (`felhasznalo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `gyakorlat_ajanlas`
 --
 
@@ -380,12 +361,6 @@ ALTER TABLE `gyakorlathozzaad`
 ALTER TABLE `sorozat`
   ADD CONSTRAINT `sorozat_ibfk_1` FOREIGN KEY (`edzesId`) REFERENCES `edzes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `sorozat_ibfk_2` FOREIGN KEY (`gyakorlatId`) REFERENCES `gyakorlat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `jelszo_reset`
---
-ALTER TABLE `jelszo_reset`
-  ADD CONSTRAINT `jelszo_reset_ibfk_1` FOREIGN KEY (`felhasznalo_id`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `gyakorlat_ajanlas`
