@@ -89,7 +89,7 @@
     padding: 18px 20px;
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    background-color: rgba(0,0,0,0.45);
+    background-color: rgb(172,191,164);
     border: 1px solid rgba(255, 255, 255, 0.25);
     box-sizing: border-box;
 }
@@ -121,9 +121,9 @@
 .profil-basic a.gomb{
     display: inline-block;
     padding: 10px 20px;
-    background: rgba(255,255,255,0.2);
+    background-color: rgba(0, 0, 0, 0.15);
     border-radius: 10px;
-    color: white;
+    color: rgb(60, 75, 33);
     text-decoration: none;
 }
 .profil-basic a.gomb:hover{
@@ -154,7 +154,7 @@
     text-decoration: none;
 }
 .profil-friends ul.friends-list a:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 .vissza-kozosseg {

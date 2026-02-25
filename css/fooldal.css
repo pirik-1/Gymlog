@@ -5,7 +5,10 @@ body {
     background-attachment: fixed;
     background-size: cover; */
     background-color: rgb(226,232,206);
-    color: rgb(38, 38, 38);
+    color: rgb(60, 75, 33);
+}
+a:-webkit-any-link {
+    text-decoration: none;
 }
 
 /* Régi horizontális menü (csak biztonsági célból) */
@@ -116,7 +119,7 @@ ul:not(.fooldal-body ul) li a:hover {
 .fooldal-body .posts-box{
     flex: 1;
     border-radius: 30px;
-    background: rgba(0,0,0,0.4);
+    background-color: rgb(172,191,164);
     padding: 30px;
     box-sizing: border-box;
 }
@@ -161,7 +164,7 @@ ul:not(.fooldal-body ul) li a:hover {
 .fooldal-body .friends-box{
     width: 260px;
     border-radius: 25px;
-    background: rgba(0,0,0,0.4);
+    background-color: rgb(172,191,164);
     padding: 20px;
     box-sizing: border-box;
 }
@@ -202,6 +205,7 @@ ul:not(.fooldal-body ul) li a:hover {
     padding: 8px 18px !important;
     font-size: 13px;
     opacity: 0.8;
+    color: rgb(255, 255, 255);
     border-top: 1px solid rgba(255,255,255,0.3);
 }
 

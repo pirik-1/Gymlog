@@ -28,7 +28,8 @@ $tervek = $bejelentkezve ? getTervek($conn, $userId) : [];
                 <?php if (!$bejelentkezve): ?>
                     <p class="posts-placeholder">
                         Jelentkezz be az edzéstervek megtekintéséhez és mentéséhez.
-                        <br><a href="login-html.php" class="auth-link-inline">Bejelentkezés</a>
+                        <br>
+                        <br><a href="login-html.php" class="auth-link-inline" style="color: rgb(60, 75, 33); background: rgba(0, 0, 0, 0.15); border-radius: 16px; padding:10px;">Bejelentkezés</a>
                     </p>
                 <?php elseif (empty($tervek)): ?>
                     <p class="posts-placeholder">
