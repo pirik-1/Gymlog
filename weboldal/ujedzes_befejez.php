@@ -59,7 +59,7 @@ $nevStmt = $conn->prepare("SELECT nev FROM felhasznalo WHERE id = ?");
 $nevStmt->bind_param("i", $userId);
 $nevStmt->execute();
 $userNev = ($r = $nevStmt->get_result()->fetch_assoc()) ? $r["nev"] : "Felhasználó";
-$idotartamFormazott = gmdate("H:i", $idotartam);
+$idotartamFormazott = gmdate("H:i:s", $idotartam);
 $tartalom = $userNev . " befejezett egy edzést: " . $nev . " (" . $idotartamFormazott . ")";
 $pstmt = $conn->prepare("INSERT INTO poszt (felhasznaloId, tartalom, edzesId) VALUES (?, ?, ?)");
 $pstmt->bind_param("isi", $userId, $tartalom, $edzesId);

@@ -1,10 +1,14 @@
-/* Alapértelmezett háttér */
+    /* Alapértelmezett háttér */
 html { overflow-x: hidden; }
 body {
-    background-image: url(../img/moonlit-asteroid.jpg);
+    /* background-image: url(../img/moonlit-asteroid.jpg);
     background-attachment: fixed;
-    background-size: cover;
-    color: white;
+    background-size: cover; */
+    background-color: rgb(226,232,206);
+    color: rgb(60, 75, 33);
+}
+a:-webkit-any-link {
+    text-decoration: none;
 }
 
 /* Régi horizontális menü (csak biztonsági célból) */
@@ -22,7 +26,7 @@ ul:not(.fooldal-body ul) li {
 
 ul:not(.fooldal-body ul) li a {
     display: block;
-    color: white;
+    color: rgb(38, 38, 38);
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -40,7 +44,7 @@ ul:not(.fooldal-body ul) li a:hover {
 
 .home-btn-a {
     display: flex;
-    color: white;
+    color: rgb(38, 38, 38);
     align-items: center;
     padding: 0;
     text-decoration: none;
@@ -62,7 +66,7 @@ ul:not(.fooldal-body ul) li a:hover {
     left: 0;
     width: 190px;
     height: 100vh;
-    background-color: rgba(0,0,0,0.75);
+    background-color: rgb(38,38,38);
     display: flex;
     flex-direction: column;
     list-style: none;
@@ -72,13 +76,14 @@ ul:not(.fooldal-body ul) li a:hover {
 }
 
 .fooldal-body .nav-menu li {
+    background-color: rgb(38,38,38);
     float: none;
 }
 
 .fooldal-body .nav-menu li a {
     text-align: left;
     padding: 10px 18px;
-    color: white;
+    color: rgb(255,255,255);
     text-decoration: none;
     display: block;
 }
@@ -114,7 +119,7 @@ ul:not(.fooldal-body ul) li a:hover {
 .fooldal-body .posts-box{
     flex: 1;
     border-radius: 30px;
-    background: rgba(0,0,0,0.4);
+    background-color: rgb(172,191,164);
     padding: 30px;
     box-sizing: border-box;
 }
@@ -159,7 +164,7 @@ ul:not(.fooldal-body ul) li a:hover {
 .fooldal-body .friends-box{
     width: 260px;
     border-radius: 25px;
-    background: rgba(0,0,0,0.4);
+    background-color: rgb(172,191,164);
     padding: 20px;
     box-sizing: border-box;
 }
@@ -200,6 +205,7 @@ ul:not(.fooldal-body ul) li a:hover {
     padding: 8px 18px !important;
     font-size: 13px;
     opacity: 0.8;
+    color: rgb(255, 255, 255);
     border-top: 1px solid rgba(255,255,255,0.3);
 }
 
@@ -254,7 +260,7 @@ ul:not(.fooldal-body ul) li a:hover {
 .fooldal-body .terv-inditas-gomb{
     display: inline-block;
     background: rgba(255,255,255,0.15);
-    color: white;
+    color: rgb(38, 38, 38);
     padding: 10px 20px;
     border-radius: 8px;
     text-decoration: none;
@@ -380,7 +386,7 @@ ul:not(.fooldal-body ul) li a:hover {
 .nav-hamburger {
     display: none;
     position: fixed;
-    top: 12px;
+    top: 2vw;
     left: 12px;
     z-index: 101;
     width: 44px;
@@ -417,6 +423,10 @@ ul:not(.fooldal-body ul) li a:hover {
 }
 
 @media (max-width: 768px) {
+    .home-btn {
+        padding-left: 25vw;
+        padding-top: 1.7vw;
+    }
     .nav-hamburger { display: flex; align-items: center; justify-content: center; }
     .fooldal-body { padding-left: 0; }
     .fooldal-body .main-nav .nav-menu {

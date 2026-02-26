@@ -46,7 +46,7 @@ if (isset($_GET["terv_id"]) && is_numeric($_GET["terv_id"])) {
 
         <div class="edzes-meta">
             <span id="gyakorlatCount">0 gyakorlat</span>
-            <span id="idotartamKijelzo" class="idotartam-kijelzo">00:00</span>
+            <span id="idotartamKijelzo" class="idotartam-kijelzo">0:00:00</span>
         </div>
 
         <div class="edzes-vezerlo">
@@ -62,7 +62,7 @@ if (isset($_GET["terv_id"]) && is_numeric($_GET["terv_id"])) {
 
         <button type="button" id="mentes" class="mentes-gomb">Edzés mentése (tervként)</button>
         <?php if (!isset($_SESSION["user_id"])): ?>
-        <p class="vendeg-hint">A mentéshez <a href="login-html.php">jelentkezz be</a>.</p>
+        <p class="vendeg-hint">A mentéshez <a href="login-html.php" style="color: rgb(60, 75, 33); background: rgba(0, 0, 0, 0.15); border-radius: 16px; padding:6px;">jelentkezz be</a>.</p>
         <?php endif; ?>
         <p id="hiba"></p>
     </div>

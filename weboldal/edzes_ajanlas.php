@@ -24,7 +24,7 @@ $statusSzoveg = ["pending" => "Függőben", "approved" => "Jóváhagyva", "rejec
     <link rel="icon" type="image/x-icon" href="../img/gymlog-white.png">
     <script src="../js/index.js" defer></script>
     <style>
-        .ajanlas-card { border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+        .ajanlas-card { border-radius: 20px; padding: 24px; margin-bottom: 20px; background-color: rgb(172,191,164);}
         .ajanlas-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
         .ajanlas-form input { flex: 1; min-width: 180px; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.3); color: white; }
         .ajanlas-form button { padding: 10px 24px; border-radius: 12px; background: rgba(110,181,255,0.3); border: 1px solid rgba(110,181,255,0.5); color: white; cursor: pointer; }
@@ -62,7 +62,7 @@ $statusSzoveg = ["pending" => "Függőben", "approved" => "Jóváhagyva", "rejec
 
                 <?php if (!$bejelentkezve): ?>
                     <p>Jelentkezz be a beajánláshoz.</p>
-                    <a href="login-html.php" class="gomb">Bejelentkezés</a>
+                    <a href="login-html.php" style="color: rgb(60, 75, 33); background: rgba(0, 0, 0, 0.15); border-radius: 16px; padding:10px;" class="gomb">Bejelentkezés</a>
                 <?php else: ?>
                 <div class="ajanlas-form">
                     <input type="text" id="ujGyakorlatNev" placeholder="Gyakorlat neve (pl. Guggolás törzselés)" maxlength="100">
