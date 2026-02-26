@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 const data = await res.json();
                 adatokUzenet.textContent = data.uzenet || "";
-                adatokUzenet.style.color = data.siker ? "lightgreen" : "red";
+                adatokUzenet.style.color = data.siker ? "green" : "red";
             } catch (e) {
                 adatokUzenet.textContent = "Hiba a kapcsolatban.";
                 adatokUzenet.style.color = "red";
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 celNev = "Tömegnövelés";
             }
 
-            kalkEredmeny.style.color = "white";
+            kalkEredmeny.style.color = "red";
             kalkEredmeny.innerHTML = `<b>Eredmény</b><br>Napi szükséglet (TDEE): <b>${Math.round(tdee)}</b> kcal/nap<br>Ajánlott bevitel (${celNev}): <b>${Math.round(celKaloria)}</b> kcal/nap`;
         });
     }

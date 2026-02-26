@@ -38,7 +38,7 @@ btn.addEventListener("click", () => {
         return;
     }
     if (!magassag || magassag < 50) {
-        hiba.style.color = "red";
+        hiba.style.color = "red"
         hiba.innerText = "Adj meg érvényes magasságot!";
         return;
     }
@@ -77,7 +77,7 @@ btn.addEventListener("click", () => {
     }
 
     // Eredmény
-    hiba.style.color = "white";
+    hiba.style.color = "green";
     hiba.innerHTML = `
         <b>Eredmény</b><br>
         Napi szükséglet (TDEE): <b>${Math.round(tdee)}</b> kcal/nap<br>

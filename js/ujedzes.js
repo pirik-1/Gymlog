@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const data = await response.json();
-            elemek.hiba.style.color = data?.siker ? "lightgreen" : "red";
+            elemek.hiba.style.color = data?.siker ? "green" : "red";
             elemek.hiba.textContent = data?.uzenet || (data?.siker ? "Edzésterv sikeresen elmentve." : "Hiba történt a mentés közben.");
         } catch (e) {
             elemek.hiba.style.color = "red";
