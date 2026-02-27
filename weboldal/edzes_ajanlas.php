@@ -44,7 +44,29 @@ $statusSzoveg = ["pending" => "Függőben", "approved" => "Jóváhagyva", "rejec
             border-color: #ffffff;
             box-shadow: 0 0 5px rgb(255, 255, 255);
         }
-        .ajanlas-form button { padding: 10px 24px; border-radius: 12px; background-color: rgb(85, 107, 47, 0.65); border: 1px solid rgba(255,255,255,0.3); color: white; cursor: pointer; }
+
+        .ajanlas-form button { 
+            padding: 10px 24px; 
+            border-radius: 20px;
+            background-color: rgb(85, 107, 47, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .ajanlas-form button:hover { 
+            background: rgb(85, 107, 47);     
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+        .ajanlas-form button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
         .ajanlas-lista { list-style: none; padding: 0; margin: 16px 0 0; }
         .ajanlas-lista li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .ajanlas-lista li:last-child { border-bottom: none; }
