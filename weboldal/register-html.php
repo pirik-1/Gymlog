@@ -19,16 +19,13 @@ session_start();
         <div class="auth-card">
             <h1>Regisztráció</h1>
 
-            <?php if (!empty($_SESSION["hiba"])): ?>
-                <p class="auth-error">
-                    <?php
-                        echo htmlspecialchars($_SESSION["hiba"]);
-                        unset($_SESSION["hiba"]);
-                    ?>
-                </p>
-            <?php endif; ?>
+            <?php 
+            $hibaUzenet = $_SESSION["hiba"] ?? "";
+            if ($hibaUzenet) unset($_SESSION["hiba"]);
+            ?>
+            <div id="regHiba" class="auth-error"<?php echo $hibaUzenet ? '' : ' style="display:none"'; ?>><?php echo $hibaUzenet ? htmlspecialchars($hibaUzenet) : ''; ?></div>
 
-            <form action="register.php" method="post" class="auth-form">
+            <form action="register.php" method="post" class="auth-form" id="regForm">
                 <label>
                     Felhasználónév
                     <input type="text" name="nev" id="nev" placeholder="Felhasználónév" required>
@@ -39,11 +36,12 @@ session_start();
                 </label>
                 <label>
                     Jelszó
-                    <input type="password" name="jelszo" id="jelszoReg" placeholder="Jelszó" required>
+                    <input type="password" name="jelszo" id="jelszoReg" placeholder="Jelszó" required minlength="8" maxlength="64" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,64}$" title="Legalább 8 karakter, szám és betű">
+                    <span class="auth-hint">Min. 8 karakter, legalább 1 szám és 1 betű</span>
                 </label>
                 <label>
                     Jelszó újra
-                    <input type="password" name="jelszo_ujra" id="jelszoRegUjra" placeholder="Jelszó újra" required>
+                    <input type="password" name="jelszo_ujra" id="jelszoRegUjra" placeholder="Jelszó újra" required minlength="8" maxlength="64">
                 </label>
                 <span class="mutasdajelszot" id="mutasdReg">Mutasd a jelszót</span>
                 <div class="gombSor">

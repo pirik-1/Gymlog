@@ -43,7 +43,7 @@ if (isset($_SESSION["user_id"])) {
                     </p>
                 <?php else: ?>
                     <?php foreach ($posztok as $poszt): ?>
-                        <article class="poszt-kartya <?php echo !empty($poszt["edzesId"]) ? 'poszt-kattinthato' : ''; ?>">
+                        <article class="poszt-kartya" data-poszt-id="<?php echo (int)$poszt["id"]; ?>">
                             <?php 
                                 $suffix = " befejezett egy edzést: ";
                                 $tartalom = $poszt["tartalom"];
@@ -52,16 +52,40 @@ if (isset($_SESSION["user_id"])) {
                                     ? htmlspecialchars($poszt["felhasznaloNev"]) . htmlspecialchars(substr($tartalom, $pos)) 
                                     : htmlspecialchars($tartalom);
                             ?>
-                            <?php if (!empty($poszt["edzesId"])): ?>
-                                <a href="edzes_reszletek.php?id=<?php echo (int)$poszt["edzesId"]; ?>" class="poszt-link">
+                            <div class="poszt-felette <?php echo !empty($poszt["edzesId"]) ? 'poszt-kattinthato' : ''; ?>">
+                                <?php if (!empty($poszt["edzesId"])): ?>
+                                    <a href="edzes_reszletek.php?id=<?php echo (int)$poszt["edzesId"]; ?>" class="poszt-link">
+                                        <p class="poszt-tartalom"><?php echo $megjelenit; ?></p>
+                                        <p class="poszt-datum"><?php echo htmlspecialchars($poszt["datum"]); ?></p>
+                                        <span class="poszt-reszlet-hint">Részletek →</span>
+                                    </a>
+                                <?php else: ?>
                                     <p class="poszt-tartalom"><?php echo $megjelenit; ?></p>
                                     <p class="poszt-datum"><?php echo htmlspecialchars($poszt["datum"]); ?></p>
-                                    <span class="poszt-reszlet-hint">Kattints a részletekért →</span>
-                                </a>
-                            <?php else: ?>
-                                <p class="poszt-tartalom"><?php echo $megjelenit; ?></p>
-                                <p class="poszt-datum"><?php echo htmlspecialchars($poszt["datum"]); ?></p>
-                            <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
+                            <div class="poszt-kommentek">
+                                <ul class="komment-lista">
+                                    <?php 
+                                    $posztKommentek = $kommentek[$poszt["id"]] ?? [];
+                                    foreach ($posztKommentek as $k): ?>
+                                        <li class="komment-elem" data-komment-id="<?php echo (int)$k["id"]; ?>">
+                                            <span class="komment-szerzo"><?php echo htmlspecialchars($k["felhasznaloNev"]); ?></span>
+                                            <span class="komment-datum"><?php echo htmlspecialchars($k["datum"]); ?></span>
+                                            <?php if ($isAdmin): ?>
+                                                <button type="button" class="komment-torles-gomb" title="Törlés">✕</button>
+                                            <?php endif; ?>
+                                            <span class="komment-tartalom"><?php echo htmlspecialchars($k["tartalom"]); ?></span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <?php if (isset($_SESSION["user_id"])): ?>
+                                    <form class="komment-uj-form" data-poszt-id="<?php echo (int)$poszt["id"]; ?>">
+                                        <input type="text" name="tartalom" placeholder="Írj kommentet..." maxlength="500" required>
+                                        <button type="submit">Küldés</button>
+                                    </form>
+                                <?php endif; ?>
+                            </div>
                         </article>
                     <?php endforeach; ?>
                 <?php endif; ?>

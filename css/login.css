@@ -51,6 +51,13 @@
     color: rgba(255, 255, 255, 0.6);
 }
 
+.auth-hint {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 4px;
+    display: block;
+}
+
 .auth-form input:focus {
     border-color: #ffffff;
     box-shadow: 0 0 5px rgb(255, 255, 255);
