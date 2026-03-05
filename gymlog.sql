@@ -1,5 +1,5 @@
--- Gymlog adatbázis - frissített séma + dummy adatok
--- Használat: Hozd létre a gymlog adatbázist, majd importáld ezt a fájlt phpMyAdmin-ban
+-- Gymlog adatbázis - séma + adatok
+-- Bejelentkezés: admin@gymlog.hu / admin123  vagy  felh@gymlog.hu / felh123
 
 SET NAMES utf8mb4;
 
@@ -97,42 +97,63 @@ CREATE TABLE gyakorlat_ajanlas (
   FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id) ON DELETE CASCADE
 );
 
--- ========== DUMMY ADATOK ==========
--- admin / admin123 (rendszergazda), felh / felh123 (simafelhasznalo), tobbi: password
+-- ========== FELHASZNÁLÓK ==========
+-- admin@gymlog.hu / admin123  |  felh@gymlog.hu / felh123
 INSERT INTO felhasznalo (email, nev, jelszo, admin, magassag, testsuly, nem) VALUES
-('admin@gymlog.hu', 'Admin', '$2y$10$zQwQk56lUqFq9PLdabhJnO7gxLfd/oNCUUwCMrez3R2slIcqPKtp2', 1, NULL, NULL, NULL),
-('felh@gymlog.hu', 'Felhasználó', '$2y$10$v2ePyDgeB0NzKRUc2cC/pepFxNl4HCh8Us29Z/DDhNnsFdGpqtEUa', 0, NULL, NULL, NULL),
-('anna@pelda.hu', 'Anna Kiss', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 165, 58, 'no'),
-('bela@pelda.hu', 'Béla Nagy', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 0, 182, 78, 'ferfi'),
-('cili@pelda.hu', 'Cili Tóth', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 0, 170, 65, 'no');
+('admin@gymlog.hu', 'Admin', '$2y$10$zQwQk56lUqFq9PLdabhJnO7gxLfd/oNCUUwCMrez3R2slIcqPKtp2', 1, 180, 85, 'ferfi'),
+('felh@gymlog.hu', 'Felhasználó', '$2y$10$v2ePyDgeB0NzKRUc2cC/pepFxNl4HCh8Us29Z/DDhNnsFdGpqtEUa', 0, 175, 72, 'ferfi');
 
--- Edzéstervek (Anna id=3, Béla id=4)
-INSERT INTO edzesterv_mentes (felhasznaloId, nev, tartalom) VALUES
-(3, 'Felsőtest', '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":false},{"rep":10,"suly":60,"kesz":false}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":10,"kesz":false}]}]'),
-(3, 'Láb nap', '[{"nev":"Guggolás","szettek":[{"rep":15,"suly":50,"kesz":false}]}]'),
-(4, 'Pull nap', '[{"nev":"Húzódzkodás","szettek":[{"rep":8,"suly":0,"kesz":false},{"rep":8,"suly":0,"kesz":false}]}]');
-
--- Edzések (befejezett)
-INSERT INTO edzes (nev, idotartam, osszsuly, datum, felhasznaloId, leiras, edzestervMentesId) VALUES
-('Felsőtest', 1850, 1200, '2025-02-28', 3, '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":true},{"rep":10,"suly":60,"kesz":true}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":10,"kesz":true}]}]', 1),
-('Láb nap', 2100, 750, '2025-03-02', 3, '[{"nev":"Guggolás","szettek":[{"rep":15,"suly":50,"kesz":true},{"rep":15,"suly":50,"kesz":true}]}]', 2),
-('Pull nap', 2400, 0, '2025-03-04', 4, '[{"nev":"Húzódzkodás","szettek":[{"rep":8,"suly":0,"kesz":true},{"rep":8,"suly":0,"kesz":true}]}]', 3),
-('Felsőtest', 900, 600, '2025-03-05', 4, '[{"nev":"Fekvenyomás","szettek":[{"rep":8,"suly":60,"kesz":true}]}]', NULL);
-
--- Posztok
-INSERT INTO poszt (felhasznaloId, tartalom, edzesId) VALUES
-(3, 'Anna Kiss befejezett egy edzést: Felsőtest (00:30:50)', 1),
-(3, 'Anna Kiss befejezett egy edzést: Láb nap (00:35:00)', 2),
-(4, 'Béla Nagy befejezett egy edzést: Pull nap (00:40:00)', 3);
-
--- Kommentek (példa)
-INSERT INTO komment (posztId, felhasznaloId, tartalom) VALUES
-(1, 4, 'Szuper edzés!'),
-(1, 5, 'Gratulálok!'),
-(2, 4, 'Láb nap a legjobb');
-
--- Barátság (Anna-Béla barátok, Cili kérte Bélát)
+-- Barátság (admin és felh barátok)
 INSERT INTO baratsag (kero_id, fogado_id, status) VALUES
-(3, 4, 'accepted'),
-(4, 3, 'accepted'),
-(5, 4, 'pending');
+(1, 2, 'accepted'),
+(2, 1, 'accepted');
+
+-- ========== EDZÉSTERVEK ==========
+INSERT INTO edzesterv_mentes (felhasznaloId, nev, tartalom) VALUES
+(1, 'Felsőtest Push', '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":false},{"rep":10,"suly":65,"kesz":false},{"rep":8,"suly":70,"kesz":false}]},{"nev":"Fej fölé nyomás","szettek":[{"rep":12,"suly":30,"kesz":false},{"rep":10,"suly":35,"kesz":false}]},{"nev":"Tricepsz letolás","szettek":[{"rep":15,"suly":25,"kesz":false},{"rep":12,"suly":30,"kesz":false}]}]'),
+(1, 'Láb nap', '[{"nev":"Guggolás","szettek":[{"rep":12,"suly":80,"kesz":false},{"rep":10,"suly":100,"kesz":false},{"rep":8,"suly":120,"kesz":false}]},{"nev":"Lábnyomás","szettek":[{"rep":15,"suly":120,"kesz":false},{"rep":12,"suly":140,"kesz":false}]},{"nev":"Hamstring curl","szettek":[{"rep":12,"suly":40,"kesz":false},{"rep":12,"suly":45,"kesz":false}]}]'),
+(1, 'Húzó nap', '[{"nev":"Rudat evezés","szettek":[{"rep":10,"suly":60,"kesz":false},{"rep":10,"suly":70,"kesz":false}]},{"nev":"Húzódzkodás","szettek":[{"rep":8,"suly":0,"kesz":false},{"rep":8,"suly":0,"kesz":false}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":12,"kesz":false},{"rep":10,"suly":14,"kesz":false},{"rep":8,"suly":16,"kesz":false}]}]'),
+(1, 'Váll specifikus', '[{"nev":"Oldalemelés","szettek":[{"rep":15,"suly":10,"kesz":false},{"rep":12,"suly":12,"kesz":false}]},{"nev":"Vállból nyomás","szettek":[{"rep":10,"suly":40,"kesz":false},{"rep":10,"suly":45,"kesz":false}]}]'),
+(2, 'Kardio + erő', '[{"nev":"Fekvenyomás","szettek":[{"rep":12,"suly":50,"kesz":false},{"rep":10,"suly":55,"kesz":false}]},{"nev":"Guggolás","szettek":[{"rep":15,"suly":60,"kesz":false},{"rep":12,"suly":70,"kesz":false}]}]'),
+(2, 'Testrész teljes', '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":false}]},{"nev":"Rudat evezés","szettek":[{"rep":10,"suly":50,"kesz":false}]},{"nev":"Guggolás","szettek":[{"rep":12,"suly":80,"kesz":false}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":10,"kesz":false}]}]');
+
+-- ========== BEFEJEZETT EDZÉSEK ==========
+INSERT INTO edzes (nev, idotartam, osszsuly, datum, felhasznaloId, leiras, edzestervMentesId) VALUES
+('Felsőtest Push', 1980, 1385, '2025-02-10', 1, '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":true},{"rep":10,"suly":65,"kesz":true},{"rep":8,"suly":70,"kesz":true}]},{"nev":"Fej fölé nyomás","szettek":[{"rep":12,"suly":30,"kesz":true},{"rep":10,"suly":35,"kesz":true}]},{"nev":"Tricepsz letolás","szettek":[{"rep":15,"suly":25,"kesz":true},{"rep":12,"suly":30,"kesz":true}]}]', 1),
+('Láb nap', 2400, 2100, '2025-02-12', 1, '[{"nev":"Guggolás","szettek":[{"rep":12,"suly":80,"kesz":true},{"rep":10,"suly":100,"kesz":true},{"rep":8,"suly":120,"kesz":true}]},{"nev":"Lábnyomás","szettek":[{"rep":15,"suly":120,"kesz":true},{"rep":12,"suly":140,"kesz":true}]},{"nev":"Hamstring curl","szettek":[{"rep":12,"suly":40,"kesz":true},{"rep":12,"suly":45,"kesz":true}]}]', 2),
+('Húzó nap', 2100, 860, '2025-02-14', 1, '[{"nev":"Rudat evezés","szettek":[{"rep":10,"suly":60,"kesz":true},{"rep":10,"suly":70,"kesz":true}]},{"nev":"Húzódzkodás","szettek":[{"rep":8,"suly":0,"kesz":true},{"rep":8,"suly":0,"kesz":true}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":12,"kesz":true},{"rep":10,"suly":14,"kesz":true},{"rep":8,"suly":16,"kesz":true}]}]', 3),
+('Felsőtest Push', 1920, 1420, '2025-02-17', 1, '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":62,"kesz":true},{"rep":10,"suly":67,"kesz":true},{"rep":8,"suly":72,"kesz":true}]},{"nev":"Fej fölé nyomás","szettek":[{"rep":12,"suly":32,"kesz":true},{"rep":10,"suly":36,"kesz":true}]},{"nev":"Tricepsz letolás","szettek":[{"rep":15,"suly":26,"kesz":true},{"rep":12,"suly":31,"kesz":true}]}]', 1),
+('Láb nap', 2550, 2200, '2025-02-19', 1, '[{"nev":"Guggolás","szettek":[{"rep":12,"suly":85,"kesz":true},{"rep":10,"suly":105,"kesz":true},{"rep":8,"suly":125,"kesz":true}]},{"nev":"Lábnyomás","szettek":[{"rep":15,"suly":125,"kesz":true},{"rep":12,"suly":145,"kesz":true}]},{"nev":"Hamstring curl","szettek":[{"rep":12,"suly":42,"kesz":true},{"rep":12,"suly":47,"kesz":true}]}]', 2),
+('Felsőtest Push', 1950, 1450, '2025-02-24', 1, '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":65,"kesz":true},{"rep":10,"suly":70,"kesz":true},{"rep":8,"suly":75,"kesz":true}]},{"nev":"Fej fölé nyomás","szettek":[{"rep":12,"suly":32,"kesz":true},{"rep":10,"suly":37,"kesz":true}]},{"nev":"Tricepsz letolás","szettek":[{"rep":15,"suly":26,"kesz":true},{"rep":12,"suly":32,"kesz":true}]}]', 1),
+('Kardio + erő', 1650, 650, '2025-02-15', 2, '[{"nev":"Fekvenyomás","szettek":[{"rep":12,"suly":50,"kesz":true},{"rep":10,"suly":55,"kesz":true}]},{"nev":"Guggolás","szettek":[{"rep":15,"suly":60,"kesz":true},{"rep":12,"suly":70,"kesz":true}]}]', 5),
+('Testrész teljes', 2400, 2100, '2025-02-20', 2, '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":true}]},{"nev":"Rudat evezés","szettek":[{"rep":10,"suly":50,"kesz":true}]},{"nev":"Guggolás","szettek":[{"rep":12,"suly":80,"kesz":true}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":10,"kesz":true}]}]', 6),
+('Kardio + erő', 1680, 680, '2025-02-25', 2, '[{"nev":"Fekvenyomás","szettek":[{"rep":12,"suly":52,"kesz":true},{"rep":10,"suly":57,"kesz":true}]},{"nev":"Guggolás","szettek":[{"rep":15,"suly":62,"kesz":true},{"rep":12,"suly":72,"kesz":true}]}]', 5),
+('Láb nap', 2200, 1950, '2025-03-01', 2, '[{"nev":"Guggolás","szettek":[{"rep":12,"suly":70,"kesz":true},{"rep":10,"suly":90,"kesz":true}]},{"nev":"Lábnyomás","szettek":[{"rep":15,"suly":100,"kesz":true},{"rep":12,"suly":120,"kesz":true}]}]', 2),
+('Felsőtest Push', 2000, 1400, '2025-03-03', 1, '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":65,"kesz":true},{"rep":10,"suly":70,"kesz":true},{"rep":8,"suly":75,"kesz":true}]},{"nev":"Fej fölé nyomás","szettek":[{"rep":12,"suly":32,"kesz":true},{"rep":10,"suly":37,"kesz":true}]},{"nev":"Tricepsz letolás","szettek":[{"rep":15,"suly":27,"kesz":true},{"rep":12,"suly":32,"kesz":true}]}]', 1),
+('Húzó nap', 2150, 880, '2025-03-05', 1, '[{"nev":"Rudat evezés","szettek":[{"rep":10,"suly":62,"kesz":true},{"rep":10,"suly":72,"kesz":true}]},{"nev":"Húzódzkodás","szettek":[{"rep":8,"suly":0,"kesz":true},{"rep":9,"suly":0,"kesz":true}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":13,"kesz":true},{"rep":10,"suly":15,"kesz":true},{"rep":8,"suly":17,"kesz":true}]}]', 3);
+
+-- ========== POSZTOK ==========
+INSERT INTO poszt (felhasznaloId, tartalom, edzesId) VALUES
+(1, 'Admin befejezett egy edzést: Felsőtest Push (00:33:00)', 1),
+(1, 'Admin befejezett egy edzést: Láb nap (00:40:00)', 2),
+(1, 'Admin befejezett egy edzést: Húzó nap (00:35:00)', 3),
+(1, 'Admin befejezett egy edzést: Felsőtest Push (00:32:00)', 4),
+(1, 'Admin befejezett egy edzést: Láb nap (00:42:30)', 5),
+(1, 'Admin befejezett egy edzést: Felsőtest Push (00:32:30)', 6),
+(2, 'Felhasználó befejezett egy edzést: Kardio + erő (00:27:30)', 7),
+(2, 'Felhasználó befejezett egy edzést: Testrész teljes (00:40:00)', 8),
+(2, 'Felhasználó befejezett egy edzést: Kardio + erő (00:28:00)', 9),
+(2, 'Felhasználó befejezett egy edzést: Láb nap (00:36:40)', 10),
+(1, 'Admin befejezett egy edzést: Felsőtest Push (00:33:20)', 11),
+(1, 'Admin befejezett egy edzést: Húzó nap (00:35:50)', 12);
+
+-- ========== KOMMENTEK ==========
+INSERT INTO komment (posztId, felhasznaloId, tartalom) VALUES
+(1, 2, 'Jól halad az admin!'),
+(1, 2, 'Push nap mindig jó'),
+(2, 2, 'Szuper láb edzés'),
+(3, 2, 'Húzó nap a kedvencem'),
+(7, 1, 'Szép munka!'),
+(7, 1, 'Kardio + erő jó kombináció'),
+(8, 1, 'Teljes testrész terv jól néz ki'),
+(10, 1, 'Láb nap mindig megéri');
