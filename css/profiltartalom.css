@@ -343,8 +343,66 @@
     background: rgba(255,255,255,0.08);
     font-size: 13px;
 }
-.naptar-nap.edzett { background-color: rgb(85, 107, 47, 0.5);; }
+.naptar-nap.edzett { background-color: rgb(85, 107, 47, 0.5); }
+.naptar-nap[data-klikkelheto="1"] { cursor: pointer; }
+.naptar-nap[data-klikkelheto="1"]:hover { background-color: rgb(85, 107, 47, 0.7); filter: brightness(1.1); }
+
+/* Naptár nap popup */
+.naptar-popup .popup-naptar-edzes {
+    background-color: rgb(226,232,206);
+    border-radius: 20px;
+    padding: 24px 28px;
+    border: 1px solid rgba(255,255,255,0.2);
+    max-width: 380px;
+    width: 90%;
+    position: relative;
+    color: rgb(60, 75, 33);
+}
+.naptar-popup .popup-naptar-edzes h3 { margin-top: 0; margin-bottom: 16px; font-size: 18px; }
+.naptar-popup-lista { list-style: none; padding: 0; margin: 0; }
+.naptar-popup-lista li { margin-bottom: 10px; }
+.naptar-popup-lista li:last-child { margin-bottom: 0; }
+.naptar-popup-lista a {
+    display: block;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(85, 107, 47, 0.25);
+    border: 1px solid rgba(85, 107, 47, 0.4);
+    color: rgb(60, 75, 33);
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.naptar-popup-lista a:hover { background: rgba(85, 107, 47, 0.4); }
+.naptar-popup-lista .edzes-nev { display: block; font-weight: 600; margin-bottom: 4px; }
+.naptar-popup-lista .edzes-meta { font-size: 13px; opacity: 0.9; }
 .naptar-jelmagy { font-size: 12px; opacity: 0.7; margin-top: 10px; }
+
+/* Edzések szűrők */
+.edzes-szurok {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.edzes-szurok .szuro-csoport {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.edzes-szurok .szuro-cimke { font-size: 14px; opacity: 0.95; white-space: nowrap; width: 52px; }
+.edzes-szurok .szuro-select {
+    flex: 1;
+    max-width: 220px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+.edzes-szurok .szuro-select option { color: #333; background: #fff; }
 
 /* Edzések lista */
 .edzes-lista { list-style: none; padding: 0; margin: 0; }

@@ -1,394 +1,118 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Generation Time: Nov 08, 2025 at 08:44 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `gymlog`
---
--- Használat: phpMyAdmin-ban válaszd ki a gymlog adatbázist, majd importáld ezt a fájlt.
--- Új telepítésnél először hozd létre az üres gymlog adatbázist.
--- Meglévő adatbázis frissítéséhez futtasd külön az új táblák CREATE TABLE részét.
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `adatok`
---
-
-CREATE TABLE `adatok` (
-  `id` int(11) NOT NULL,
-  `testsuly` int(11) DEFAULT NULL,
-  `magassag` int(11) DEFAULT NULL,
-  `nem` enum('férfi','nő') DEFAULT NULL,
-  `felhasznaloId` int(11) NOT NULL,
-  `datum` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `edzes`
---
-
-CREATE TABLE `edzes` (
-  `id` int(11) NOT NULL,
-  `nev` varchar(30) NOT NULL,
-  `idotartam` int(11) DEFAULT NULL,
-  `osszsuly` int(11) DEFAULT NULL,
-  `datum` date NOT NULL,
-  `felhasznaloId` int(11) NOT NULL,
-  `leiras` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `edzesterv`
---
-
-CREATE TABLE `edzesterv` (
-  `id` int(11) NOT NULL,
-  `nev` varchar(30) NOT NULL,
-  `felhasznaloId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `edzestervgyakorlat`
---
-
-CREATE TABLE `edzestervgyakorlat` (
-  `id` int(11) NOT NULL,
-  `edzestervId` int(11) NOT NULL,
-  `gyakorlatId` int(11) NOT NULL,
-  `sorrend` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `felhasznalo`
---
-
-CREATE TABLE `felhasznalo` (
-  `id` int(11) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `nev` varchar(50) NOT NULL,
-  `jelszo` varchar(255) NOT NULL,
-  `admin` tinyint(1) NOT NULL DEFAULT 0,
-  `magassag` int(10) UNSIGNED DEFAULT NULL,
-  `testsuly` int(10) UNSIGNED DEFAULT NULL,
-  `nem` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `gyakorlat`
---
-
-CREATE TABLE `gyakorlat` (
-  `id` int(11) NOT NULL,
-  `nev` varchar(30) NOT NULL,
-  `izomcsoport` varchar(20) DEFAULT NULL,
-  `sullyal` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `gyakorlathozzaad`
---
-
-CREATE TABLE `gyakorlathozzaad` (
-  `id` int(11) NOT NULL,
-  `nev` varchar(30) NOT NULL,
-  `sullyal` tinyint(1) NOT NULL,
-  `megjegyzes` text DEFAULT NULL,
-  `felhasznaloId` int(11) NOT NULL,
-  `datum` date NOT NULL DEFAULT curdate(),
-  `jovahagyva` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `sorozat`
---
-
-CREATE TABLE `sorozat` (
-  `id` int(11) NOT NULL,
-  `edzesId` int(11) NOT NULL,
-  `gyakorlatId` int(11) NOT NULL,
-  `ismertles` int(11) NOT NULL,
-  `suly` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `gyakorlat_ajanlas`
---
-
-CREATE TABLE `gyakorlat_ajanlas` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `felhasznalo_id` int(11) NOT NULL,
-  `nev` varchar(100) NOT NULL,
-  `status` enum('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-  `datum` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `felhasznalo_id` (`felhasznalo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `baratsag`
---
-
-CREATE TABLE `baratsag` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `kero_id` int(11) NOT NULL,
-  `fogado_id` int(11) NOT NULL,
-  `status` enum('pending','accepted') NOT NULL DEFAULT 'pending',
-  `datum` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_keres` (`kero_id`,`fogado_id`),
-  KEY `fogado_id` (`fogado_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `poszt`
---
-
-CREATE TABLE `poszt` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `felhasznaloId` int(11) NOT NULL,
-  `tartalom` varchar(500) NOT NULL,
-  `datum` datetime NOT NULL DEFAULT current_timestamp(),
-  `edzesId` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `felhasznaloId` (`felhasznaloId`),
-  KEY `edzesId` (`edzesId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `edzesterv_mentes`
---
-
-CREATE TABLE `edzesterv_mentes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `felhasznaloId` int(11) NOT NULL,
-  `nev` varchar(100) NOT NULL,
-  `tartalom` longtext NOT NULL,
-  `letrehozva` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `felhasznaloId` (`felhasznaloId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `adatok`
---
-ALTER TABLE `adatok`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `felhasznaloId` (`felhasznaloId`);
-
---
--- Indexes for table `edzes`
---
-ALTER TABLE `edzes`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `felhasznaloId` (`felhasznaloId`);
-
---
--- Indexes for table `edzesterv`
---
-ALTER TABLE `edzesterv`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `felhasznaloId` (`felhasznaloId`);
-
---
--- Indexes for table `edzestervgyakorlat`
---
-ALTER TABLE `edzestervgyakorlat`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `edzestervId` (`edzestervId`),
-  ADD KEY `gyakorlatId` (`gyakorlatId`);
-
---
--- Indexes for table `felhasznalo`
---
-ALTER TABLE `felhasznalo`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- Indexes for table `gyakorlat`
---
-ALTER TABLE `gyakorlat`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `gyakorlathozzaad`
---
-ALTER TABLE `gyakorlathozzaad`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `felhasznaloId` (`felhasznaloId`);
-
---
--- Indexes for table `sorozat`
---
-ALTER TABLE `sorozat`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `edzesId` (`edzesId`),
-  ADD KEY `gyakorlatId` (`gyakorlatId`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `adatok`
---
-ALTER TABLE `adatok`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `edzes`
---
-ALTER TABLE `edzes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `edzesterv`
---
-ALTER TABLE `edzesterv`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `edzestervgyakorlat`
---
-ALTER TABLE `edzestervgyakorlat`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `felhasznalo`
---
-ALTER TABLE `felhasznalo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `gyakorlat`
---
-ALTER TABLE `gyakorlat`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `gyakorlathozzaad`
---
-ALTER TABLE `gyakorlathozzaad`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `sorozat`
---
-ALTER TABLE `sorozat`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `adatok`
---
-ALTER TABLE `adatok`
-  ADD CONSTRAINT `adatok_ibfk_1` FOREIGN KEY (`felhasznaloId`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `edzes`
---
-ALTER TABLE `edzes`
-  ADD CONSTRAINT `edzes_ibfk_1` FOREIGN KEY (`felhasznaloId`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `edzesterv`
---
-ALTER TABLE `edzesterv`
-  ADD CONSTRAINT `edzesterv_ibfk_1` FOREIGN KEY (`felhasznaloId`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `edzestervgyakorlat`
---
-ALTER TABLE `edzestervgyakorlat`
-  ADD CONSTRAINT `edzestervgyakorlat_ibfk_1` FOREIGN KEY (`edzestervId`) REFERENCES `edzesterv` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `edzestervgyakorlat_ibfk_2` FOREIGN KEY (`gyakorlatId`) REFERENCES `gyakorlat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `gyakorlathozzaad`
---
-ALTER TABLE `gyakorlathozzaad`
-  ADD CONSTRAINT `gyakorlathozzaad_ibfk_1` FOREIGN KEY (`felhasznaloId`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `sorozat`
---
-ALTER TABLE `sorozat`
-  ADD CONSTRAINT `sorozat_ibfk_1` FOREIGN KEY (`edzesId`) REFERENCES `edzes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `sorozat_ibfk_2` FOREIGN KEY (`gyakorlatId`) REFERENCES `gyakorlat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `gyakorlat_ajanlas`
---
-ALTER TABLE `gyakorlat_ajanlas`
-  ADD CONSTRAINT `gyakorlat_ajanlas_ibfk_1` FOREIGN KEY (`felhasznalo_id`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `baratsag`
---
-ALTER TABLE `baratsag`
-  ADD CONSTRAINT `baratsag_ibfk_1` FOREIGN KEY (`kero_id`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `baratsag_ibfk_2` FOREIGN KEY (`fogado_id`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `poszt`
---
-ALTER TABLE `poszt`
-  ADD CONSTRAINT `poszt_ibfk_1` FOREIGN KEY (`felhasznaloId`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `poszt_ibfk_2` FOREIGN KEY (`edzesId`) REFERENCES `edzes` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `edzesterv_mentes`
---
-ALTER TABLE `edzesterv_mentes`
-  ADD CONSTRAINT `edzesterv_mentes_ibfk_1` FOREIGN KEY (`felhasznaloId`) REFERENCES `felhasznalo` (`id`) ON DELETE CASCADE;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- Gymlog adatbázis - frissített séma + dummy adatok
+-- Használat: Hozd létre a gymlog adatbázist, majd importáld ezt a fájlt phpMyAdmin-ban
+
+SET NAMES utf8mb4;
+
+-- Régi adatok törlése
+DROP TABLE IF EXISTS poszt;
+DROP TABLE IF EXISTS edzes;
+DROP TABLE IF EXISTS edzesterv_mentes;
+DROP TABLE IF EXISTS baratsag;
+DROP TABLE IF EXISTS gyakorlat_ajanlas;
+DROP TABLE IF EXISTS adatok;
+DROP TABLE IF EXISTS sorozat;
+DROP TABLE IF EXISTS edzestervgyakorlat;
+DROP TABLE IF EXISTS edzesterv;
+DROP TABLE IF EXISTS gyakorlathozzaad;
+DROP TABLE IF EXISTS gyakorlat;
+DROP TABLE IF EXISTS felhasznalo;
+
+-- Felhasználók
+CREATE TABLE felhasznalo (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  nev VARCHAR(50) NOT NULL,
+  jelszo VARCHAR(255) NOT NULL,
+  admin TINYINT(1) DEFAULT 0,
+  magassag INT DEFAULT NULL,
+  testsuly INT DEFAULT NULL,
+  nem VARCHAR(20) DEFAULT NULL
+);
+
+-- Edzések
+CREATE TABLE edzes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nev VARCHAR(30) NOT NULL,
+  idotartam INT DEFAULT NULL,
+  osszsuly INT DEFAULT NULL,
+  datum DATE NOT NULL,
+  felhasznaloId INT NOT NULL,
+  leiras TEXT,
+  edzestervMentesId INT DEFAULT NULL,
+  FOREIGN KEY (felhasznaloId) REFERENCES felhasznalo(id) ON DELETE CASCADE
+);
+
+-- Posztok (hírfolyam)
+CREATE TABLE poszt (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  felhasznaloId INT NOT NULL,
+  tartalom VARCHAR(500) NOT NULL,
+  datum DATETIME DEFAULT CURRENT_TIMESTAMP,
+  edzesId INT DEFAULT NULL,
+  FOREIGN KEY (felhasznaloId) REFERENCES felhasznalo(id) ON DELETE CASCADE,
+  FOREIGN KEY (edzesId) REFERENCES edzes(id) ON DELETE SET NULL
+);
+
+-- Mentett edzéstervek
+CREATE TABLE edzesterv_mentes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  felhasznaloId INT NOT NULL,
+  nev VARCHAR(100) NOT NULL,
+  tartalom LONGTEXT NOT NULL,
+  letrehozva DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (felhasznaloId) REFERENCES felhasznalo(id) ON DELETE CASCADE
+);
+
+-- Barátság
+CREATE TABLE baratsag (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  kero_id INT NOT NULL,
+  fogado_id INT NOT NULL,
+  status ENUM('pending','accepted') DEFAULT 'pending',
+  datum DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_keres (kero_id, fogado_id),
+  FOREIGN KEY (kero_id) REFERENCES felhasznalo(id) ON DELETE CASCADE,
+  FOREIGN KEY (fogado_id) REFERENCES felhasznalo(id) ON DELETE CASCADE
+);
+
+-- Gyakorlat javaslat (admin jóváhagyja)
+CREATE TABLE gyakorlat_ajanlas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  felhasznalo_id INT NOT NULL,
+  nev VARCHAR(100) NOT NULL,
+  status ENUM('pending','approved','rejected') DEFAULT 'pending',
+  datum DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (felhasznalo_id) REFERENCES felhasznalo(id) ON DELETE CASCADE
+);
+
+-- ========== DUMMY ADATOK ==========
+-- Jelszó mindenhol: password
+INSERT INTO felhasznalo (email, nev, jelszo, admin, magassag, testsuly, nem) VALUES
+('anna@pelda.hu', 'Anna Kiss', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, 165, 58, 'no'),
+('bela@pelda.hu', 'Béla Nagy', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 0, 182, 78, 'ferfi'),
+('cili@pelda.hu', 'Cili Tóth', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 0, 170, 65, 'no');
+
+-- Edzéstervek (Anna és Béla)
+INSERT INTO edzesterv_mentes (felhasznaloId, nev, tartalom) VALUES
+(1, 'Felsőtest', '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":false},{"rep":10,"suly":60,"kesz":false}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":10,"kesz":false}]}]'),
+(1, 'Láb nap', '[{"nev":"Guggolás","szettek":[{"rep":15,"suly":50,"kesz":false}]}]'),
+(2, 'Pull nap', '[{"nev":"Húzódzkodás","szettek":[{"rep":8,"suly":0,"kesz":false},{"rep":8,"suly":0,"kesz":false}]}]');
+
+-- Edzések (befejezett)
+INSERT INTO edzes (nev, idotartam, osszsuly, datum, felhasznaloId, leiras, edzestervMentesId) VALUES
+('Felsőtest', 1850, 1200, '2025-02-28', 1, '[{"nev":"Fekvenyomás","szettek":[{"rep":10,"suly":60,"kesz":true},{"rep":10,"suly":60,"kesz":true}]},{"nev":"Bicepsz curl","szettek":[{"rep":12,"suly":10,"kesz":true}]}]', 1),
+('Láb nap', 2100, 750, '2025-03-02', 1, '[{"nev":"Guggolás","szettek":[{"rep":15,"suly":50,"kesz":true},{"rep":15,"suly":50,"kesz":true}]}]', 2),
+('Pull nap', 2400, 0, '2025-03-04', 2, '[{"nev":"Húzódzkodás","szettek":[{"rep":8,"suly":0,"kesz":true},{"rep":8,"suly":0,"kesz":true}]}]', 3),
+('Felsőtest', 900, 600, '2025-03-05', 2, '[{"nev":"Fekvenyomás","szettek":[{"rep":8,"suly":60,"kesz":true}]}]', NULL);
+
+-- Posztok
+INSERT INTO poszt (felhasznaloId, tartalom, edzesId) VALUES
+(1, 'Anna Kiss befejezett egy edzést: Felsőtest (00:30:50)', 1),
+(1, 'Anna Kiss befejezett egy edzést: Láb nap (00:35:00)', 2),
+(2, 'Béla Nagy befejezett egy edzést: Pull nap (00:40:00)', 3);
+
+-- Barátság (Anna-Béla barátok, Cili kérte Bélát)
+INSERT INTO baratsag (kero_id, fogado_id, status) VALUES
+(1, 2, 'accepted'),
+(2, 1, 'accepted'),
+(3, 2, 'pending');

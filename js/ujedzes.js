@@ -62,20 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
         elemek.befejezGomb.disabled = true;
     }
 
-    // Ha van mentett start (pl. frissítés után), indítsuk a timert
+    // Indítás csak az Indít gombra – ne induljon automatikusan frissítés után sem
     function timerVisszaallit() {
-        const saved = sessionStorage.getItem(STORAGE_KEY);
-        if (saved && elemek.valasztottWrap.querySelectorAll(".edzes-blokk").length > 0) {
-            startTime = parseInt(saved, 10);
-            elemek.inditGomb.disabled = true;
-            elemek.befejezGomb.disabled = false;
-            if (!timerInterval) {
-                timerInterval = setInterval(() => {
-                    elemek.idotartamKijelzo.textContent = formatIdo(getElteltMasodperc());
-                }, 1000);
-            }
-            elemek.idotartamKijelzo.textContent = formatIdo(getElteltMasodperc());
-        }
+        sessionStorage.removeItem(STORAGE_KEY);
     }
 
     // Gyakorlat számláló frissítése
@@ -174,9 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         elemek.valasztottWrap.appendChild(gyakorlatBlokkLetrehozasa(nev, szettek));
         frissitDarab();
-        if (elemek.valasztottWrap.querySelectorAll(".edzes-blokk").length === 1) {
-            timerIndit();
-        }
         panelCsuk();
     });
 
@@ -297,7 +283,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({
                     nev: edzesNev,
                     sorok: sorok,
-                    idotartam: idotartamMasodperc
+                    idotartam: idotartamMasodperc,
+                    terv_id: window.tervId || undefined
                 })
             });
 
@@ -388,7 +375,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 elemek.valasztottWrap.appendChild(gyakorlatBlokkLetrehozasa(sor.nev, szettek));
             });
             frissitDarab();
-            if (sorok.length > 0) timerIndit();
         }
     }
 
