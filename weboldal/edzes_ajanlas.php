@@ -76,9 +76,74 @@ $statusSzoveg = ["pending" => "Függőben", "approved" => "Jóváhagyva", "rejec
         .ajanlas-státusz.rejected { background: rgba(255,80,80,0.3); }
         .admin-gombok { display: flex; gap: 8px; }
         .admin-gombok button { padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; border: none; }
-        .admin-gombok .jovahagy { background: rgba(80,200,80,0.4); color: white; }
-        .admin-gombok .elutasit { background: rgba(255,80,80,0.4); color: white; }
-        .admin-gombok .torles { background: rgba(255,120,80,0.5); color: white; }
+        .admin-gombok .jovahagy {
+            text-decoration: bold;
+            display: inline-block;
+            background: rgba(80,200,80,0.4); 
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .admin-gombok .jovahagy:hover { 
+            background-color:  rgb(70, 200, 70);   
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+        .admin-gombok .jovahagy:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+
+        .admin-gombok .elutasit {
+            text-decoration: bold;
+            padding: 10px 20px;
+            display: inline-block;
+            /* border-radius: 20px; */
+            background-color: rgba(255, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .admin-gombok .elutasit:hover { 
+            background-color:  rgba(255, 0, 0, 0.8);    
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+        .admin-gombok .elutasit:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .admin-gombok .torles {
+            text-decoration: bold;
+            padding: 10px 20px;
+            display: inline-block;
+            /* border-radius: 20px; */
+            background-color: rgba(255, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            cursor: pointer;
+            font-size: 15px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .admin-gombok .torles:hover { 
+            background-color:  rgba(255, 0, 0, 0.8);    
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+        .admin-gombok .torles:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
         @media (max-width: 600px) {
             .ajanlas-card { padding: 16px; }
             .ajanlas-form { flex-direction: column; }
