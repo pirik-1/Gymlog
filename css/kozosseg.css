@@ -134,6 +134,16 @@
 }
 
 @media (max-width: 768px) {
+    .kerelmek-box { padding: 16px; }
     .kerelm-sor { flex-wrap: wrap; gap: 10px; }
     .kereses-form { flex-direction: column; }
+    .user-link { padding: 12px 14px; }
+}
+
+@media (max-width: 600px) {
+    .kerelmek-box { padding: 12px; margin-bottom: 20px; }
+    .kerelm-sor { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .kereses-form button { width: 100%; }
+    .user-nev { font-size: 15px; }
+    .user-email { font-size: 12px; }
 }

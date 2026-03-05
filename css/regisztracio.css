@@ -122,16 +122,14 @@ a.gomb {
 }
 
 /* ===== MOBIL ===== */
+@media (max-width: 600px) {
+    .regDiv { width: min(100%, 400px); padding: 24px 20px; }
+    .regDiv h1 { font-size: 40px; }
+}
+
 @media (max-width: 480px) {
-    .regDiv h1 {
-        font-size: 38px;
-    }
-
-    .gombSor {
-        flex-direction: column;
-    }
-
-    button {
-        width: 100%;
-    }
+    .regDiv { width: calc(100% - 24px); padding: 20px 16px; margin: 16px 12px; }
+    .regDiv h1 { font-size: 32px; }
+    .gombSor { flex-direction: column; }
+    button { width: 100%; }
 }

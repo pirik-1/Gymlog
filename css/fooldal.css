@@ -1,4 +1,5 @@
 html { overflow-x: hidden; }
+img { max-width: 100%; height: auto; }
 body {
     background-color: rgb(226,232,206);
     color: rgb(60, 75, 33);
@@ -589,7 +590,7 @@ ul:not(.fooldal-body ul) li a:hover {
 .nav-hamburger {
     display: none;
     position: fixed;
-    top: 2vw;
+    top: 12px;
     left: 12px;
     z-index: 101;
     width: 44px;
@@ -626,13 +627,8 @@ ul:not(.fooldal-body ul) li a:hover {
 }
 
 @media (max-width: 768px) {
-    html{margin-top: 10vw;}
-    .home-btn {
-        padding-left: 25vw;
-        padding-top: 1.7vw;
-    }
     .nav-hamburger { display: flex; align-items: center; justify-content: center; }
-    .fooldal-body { padding-left: 0; }
+    .fooldal-body { padding-left: 0; padding-top: 56px; }
     .fooldal-body .main-nav .nav-menu {
         transform: translateX(-100%);
         width: 260px;
@@ -640,7 +636,7 @@ ul:not(.fooldal-body ul) li a:hover {
     .fooldal-body .main-nav .nav-menu.nav-open {
         transform: translateX(0);
     }
-    .fooldal-body .main-shell { margin: 20px 12px; }
+    .fooldal-body .main-shell { margin: 20px 12px; max-width: 100%; }
     .fooldal-body .outer-box {
         flex-direction: column;
         padding: 16px;
@@ -648,11 +644,37 @@ ul:not(.fooldal-body ul) li a:hover {
     }
     .fooldal-body .friends-box { width: 100%; }
     .fooldal-body .posts-box { padding: 20px; }
+    .fooldal-body .posts-box h1 { font-size: 22px; }
+    .fooldal-body .edzes-reszlet-cim { font-size: 22px; }
+    .fooldal-body .edzes-reszlet-meta { flex-direction: column; gap: 4px; align-items: flex-start; }
+    .fooldal-body .edzes-reszlet-meta .meta-cimke + .meta-cimke::before { display: none; }
+    .fooldal-body .edzes-reszlet-kartya { padding: 20px; }
+    .fooldal-body .szett-sor-reszlet { flex-wrap: wrap; gap: 6px; }
+    .fooldal-body .gyakorlat-nev-reszlet { font-size: 16px; }
 }
 
 @media (max-width: 600px) {
+    .fooldal-body { padding-top: 52px; }
     .fooldal-body .main-shell { margin: 16px 10px; }
+    .fooldal-body .outer-box { padding: 12px; border-radius: 20px; }
+    .fooldal-body .posts-box { padding: 16px; }
+    .fooldal-body .poszt-kartya { padding: 12px 16px; }
+    .fooldal-body .poszt-tartalom { font-size: 14px; }
     .fooldal-body .terv-kartya-gombok { flex-direction: column; }
     .fooldal-body .terv-inditas-gomb,
     .fooldal-body .terv-torles-gomb { width: 100%; text-align: center; }
+    .fooldal-body .edzes-reszlet-cim { font-size: 20px; }
+    .fooldal-body .edzes-reszlet-kartya { padding: 16px; }
+    .fooldal-body .edzes-gyakorlat-blokk { padding: 12px 14px; }
+    .fooldal-body .komment-elem { padding: 8px 10px; font-size: 13px; }
+    .fooldal-body .komment-uj-form input,
+    .fooldal-body .komment-uj-form button { padding: 8px 12px; font-size: 14px; }
+    .fooldal-body .vissza-link { display: inline-block; padding: 8px 14px; font-size: 14px; }
+    .fooldal-body .mentes-tervkent-gomb { width: 100%; text-align: center; }
+}
+
+@media (max-width: 400px) {
+    .fooldal-body .main-shell { margin: 12px 8px; }
+    .fooldal-body .posts-szuro { flex-direction: column; align-items: flex-start; }
+    .fooldal-body .szuro-gomb { width: 100%; text-align: center; }
 }

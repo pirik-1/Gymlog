@@ -75,19 +75,30 @@
 }
 
 @media (max-width: 900px) {
-    .profil-fo{margin-top: 10vw;}
+    .profil-fo { margin-top: 0; }
     .profil-shell { grid-template-columns: 1fr; }
     .profil-tartalom-grid { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 768px) {
+    .profil-main { margin: 20px 12px; }
+}
+
 @media (max-width: 600px) {
     .profil-main { margin: 16px 10px; }
-    .profil-card { padding: 16px;}
-    /* .profil-card:first-child {margin-top: 100px;} */
+    .profil-card { padding: 16px; }
     .fej-sor { flex-direction: column; gap: 12px; }
     .fej-statok { flex-wrap: wrap; }
     .naptar-grid { gap: 4px; }
     .naptar-nap { font-size: 11px; }
+    .profil-fejezet h1, .profil-basic h1 { font-size: 22px; }
+    .edzes-szurok .szuro-csoport { flex-direction: column; align-items: stretch; }
+    .edzes-szurok .szuro-select { max-width: none; }
+}
+
+@media (max-width: 400px) {
+    .profil-main { margin: 12px 8px; }
+    .profil-card { padding: 14px; }
 }
 
 .profil-card{

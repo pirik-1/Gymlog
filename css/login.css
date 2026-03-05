@@ -137,29 +137,14 @@ a.gomb:active {
 }
 
 @media (max-width: 768px) {
-    .auth-main { margin: 24px 16px; max-width: 100%; }
-    .auth-card { padding: 24px 20px; }
+    .auth-main { margin: 24px 16px; max-width: 100%; padding: 0 12px; box-sizing: border-box; }
+    .auth-card { padding: 24px 20px; width: 100%; }
 }
 
 @media (max-width: 480px) {
-    .auth-main {
-        margin: 20px auto;
-        padding: 0 12px;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-    .auth-card {
-        width: 100%;
-    }
-    .gombSor {
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-    }
-    .auth-form button,
-    a.gomb {
-        width: 100%;
-        justify-content: center;
-        box-sizing: border-box;
-    }
+    .auth-main { margin: 20px 12px; padding: 0 8px; max-width: 100%; box-sizing: border-box; }
+    .auth-card { padding: 20px 16px; width: 100%; }
+    .auth-card h1 { font-size: 24px; }
+    .gombSor { flex-direction: column; align-items: stretch; width: 100%; }
+    .auth-form button, a.gomb { width: 100%; justify-content: center; box-sizing: border-box; }
 }
