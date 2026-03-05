@@ -13,6 +13,7 @@ $tervek = $bejelentkezve ? getTervek($conn, $userId) : [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/fooldal.css">
+    <link rel="stylesheet" href="../css/ujedzes.css">
     <link rel="icon" type="image/x-icon" href="../img/gymlog-white.png">
     <script src="../js/index.js" defer></script>
     <title>Edzéstervek</title>
@@ -35,29 +36,47 @@ $tervek = $bejelentkezve ? getTervek($conn, $userId) : [];
                     <p class="posts-placeholder">
                         Még nincs elmentett edzésterved. Hozz létre egyet az „Új edzés” fülön, majd kattints az „Edzés mentése” gombra.
                     </p>
+                    <p><a href="index.php" class="vissza-link">Vissza a főoldalra</a></p>
                 <?php else: ?>
-                    <?php foreach ($tervek as $terv): ?>
-                        <article class="terv-kartya">
-                            <h2><?php echo htmlspecialchars($terv["nev"]); ?></h2>
-                            <p class="terv-datum">
-                                Létrehozva: <?php echo htmlspecialchars($terv["letrehozva"]); ?>
-                            </p>
-                            <?php
-                                $sorok = json_decode($terv["tartalom"], true) ?: [];
-                            ?>
-                            <?php if (!empty($sorok)): ?>
-                                <ul class="terv-gyakorlatok">
-                                    <?php foreach ($sorok as $sor): ?>
-                                        <li>
-                                            <?php 
-                                                echo htmlspecialchars($sor["nev"] ?? "");
-                                                echo htmlspecialchars(formatGyakorlatReszletek($sor));
-                                            ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            <?php else: ?>
+                    <?php foreach ($tervek as $terv): 
+                        $sorok = json_decode($terv["tartalom"], true) ?: [];
+                    ?>
+                        <article class="edzes-reszlet-kartya terv-kartya">
+                            <h1 class="edzes-reszlet-cim"><?php echo htmlspecialchars($terv["nev"]); ?></h1>
+                            <div class="edzes-reszlet-meta">
+                                <span class="meta-cimke">Létrehozva: <?php echo htmlspecialchars($terv["letrehozva"]); ?></span>
+                            </div>
+                            <h2 class="edzes-reszlet-alcim">Gyakorlatok</h2>
+                            <?php if (empty($sorok)): ?>
                                 <p>Nincsenek gyakorlatok mentve ehhez a tervhez.</p>
+                            <?php else: ?>
+                                <div class="edzes-gyakorlat-lista">
+                                    <?php foreach ($sorok as $sor): 
+                                        $gyakNev = $sor["nev"] ?? "";
+                                        $szettek = $sor["szettek"] ?? [];
+                                        if (empty($szettek) && isset($sor["set"])) {
+                                            $szettek = array_fill(0, (int)$sor["set"], ["rep" => $sor["rep"] ?? 0, "suly" => $sor["suly"] ?? 0, "kesz" => false]);
+                                        }
+                                    ?>
+                                    <div class="edzes-gyakorlat-blokk">
+                                        <h3 class="gyakorlat-nev-reszlet"><?php echo htmlspecialchars($gyakNev); ?></h3>
+                                        <ul class="szett-lista-reszlet">
+                                            <?php foreach ($szettek as $idx => $sz): 
+                                                $rep = (int)($sz["rep"] ?? 0);
+                                                $suly = (int)($sz["suly"] ?? 0);
+                                                $szoveg = $rep > 0 ? $rep . " ismétlés" : "";
+                                                if ($suly > 0) $szoveg .= ($szoveg ? ", " : "") . $suly . " kg";
+                                                $szoveg = $szoveg ?: "—";
+                                            ?>
+                                            <li class="szett-sor-reszlet">
+                                                <span class="szett-szam"><?php echo ($idx + 1); ?>.</span>
+                                                <span class="szett-adatok"><?php echo htmlspecialchars($szoveg); ?></span>
+                                            </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
                             <?php endif; ?>
                             <div class="terv-kartya-gombok">
                                 <a href="ujedzes.php?terv_id=<?php echo (int)$terv["id"]; ?>" class="terv-inditas-gomb">Terv indítása</a>
@@ -65,6 +84,7 @@ $tervek = $bejelentkezve ? getTervek($conn, $userId) : [];
                             </div>
                         </article>
                     <?php endforeach; ?>
+                    <p><a href="index.php" class="vissza-link">Vissza a főoldalra</a></p>
                 <?php endif; ?>
             </section>
 
