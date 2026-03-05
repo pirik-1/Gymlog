@@ -146,8 +146,6 @@
     background: rgb(47, 58, 47);
     color: white;
 
-    max-height: 260px;
-    overflow-y: auto;
     box-sizing: border-box;
 }
 

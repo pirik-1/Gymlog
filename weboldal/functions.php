@@ -285,6 +285,37 @@ function getBaratiKerelmek($c, $fid) { return baratiKerelmek($c, $fid); }
 function getTervAdatok($c, $tid, $uid) { return tervLekeres($c, $tid, $uid); }
 function getTervek($c, $uid) { return tervekLekeres($c, $uid); }
 function getPosztok($c, $l, $uid = null, $cb = false) { return posztokLekeres($c, $l, $uid, $cb); }
+
+function kommentekLekeres($conn, $posztIds) {
+    if (empty($posztIds)) return [];
+    $helyek = implode(",", array_map("intval", $posztIds));
+    $lista = [];
+    $eredmeny = $conn->query("SELECT k.id, k.posztId, k.felhasznaloId, k.tartalom, k.datum, f.nev as felhasznaloNev FROM komment k JOIN felhasznalo f ON f.id = k.felhasznaloId WHERE k.posztId IN ($helyek) ORDER BY k.datum ASC");
+    if ($eredmeny) while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
+}
+
+function kommentHozzaad($conn, $posztId, $felhasznaloId, $tartalom) {
+    $tartalom = trim($tartalom);
+    if ($tartalom === "" || strlen($tartalom) > 500) return false;
+    $posztId = (int)$posztId;
+    $felhasznaloId = (int)$felhasznaloId;
+    $lekerdezes = $conn->prepare("SELECT id FROM poszt WHERE id = ?");
+    $lekerdezes->bind_param("i", $posztId);
+    $lekerdezes->execute();
+    if (!$lekerdezes->get_result()->fetch_assoc()) return false;
+    $beszur = $conn->prepare("INSERT INTO komment (posztId, felhasznaloId, tartalom) VALUES (?, ?, ?)");
+    $beszur->bind_param("iis", $posztId, $felhasznaloId, $tartalom);
+    return $beszur->execute();
+}
+
+function kommentTorles($conn, $kommentId, $felhasznaloId, $isAdmin) {
+    if (!$isAdmin) return false;
+    $kommentId = (int)$kommentId;
+    $torles = $conn->prepare("DELETE FROM komment WHERE id = ?");
+    $torles->bind_param("i", $kommentId);
+    return $torles->execute();
+}
 function getOsszesGyakorlat($c) { return gyakorlatokLekeres($c); }
 function getFelhasznalok($c, $uid, $k = "") { return felhasznalokLekeres($c, $uid, $k); }
 function getBaratok($c, $uid) { return baratokLekeres($c, $uid); }

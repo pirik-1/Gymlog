@@ -19,6 +19,7 @@
     flex-direction: column;
     gap: 20px;
     min-width: 0;
+    overflow: visible;
 }
 
 .profil-oldal{
@@ -58,6 +59,7 @@
     grid-template-columns: 1fr 320px;
     gap: 20px;
     align-items: start;
+    overflow: visible;
 }
 
 .profil-mellék {
@@ -68,6 +70,8 @@
 
 .profil-edzesek-fo {
     min-height: 200px;
+    overflow: visible;
+    padding-bottom: 24px;
 }
 
 @media (max-width: 900px) {
@@ -405,9 +409,9 @@
 .edzes-szurok .szuro-select option { color: #333; background: #fff; }
 
 /* Edzések lista */
-.edzes-lista { list-style: none; padding: 0; margin: 0; }
+.edzes-lista { list-style: none; padding: 0; margin: 0 0 20px 0; overflow: visible; }
 .edzes-lista li { border-bottom: 1px solid rgba(255,255,255,0.12); }
-.edzes-lista li:last-child { border-bottom: none; }
+.edzes-lista li:last-child { border-bottom: none; margin-bottom: 0; }
 .edzes-lista a {
     display: block;
     padding: 12px 10px;
@@ -526,5 +530,22 @@
 @media (max-width: 480px) {
     .popup-kalkulator { margin: 20px; max-width: calc(100% - 40px); padding: 20px; }
 }
-.profil-nem-mas { font-size: 14px; }
-.profil-nem-mas .label { font-weight: 600; margin-right: 6px; }
+.profil-nev-sor { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nem-ikon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+}
+.nem-no {
+    background: rgba(236, 72, 153, 0.35);
+    color: #ec4899;
+}
+.nem-ferfi {
+    background: rgba(59, 130, 246, 0.35);
+    color: #3b82f6;
+}
