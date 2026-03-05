@@ -135,7 +135,14 @@ function profilUrl($params, $overrides = []) {
             <div class="profil-card profil-fejezet">
                 <div class="fej-sor">
                     <div class="fej-bal">
-                        <h1><?php echo htmlspecialchars($profilUser["nev"]); ?></h1>
+                        <h1 class="profil-nev-sor">
+                            <?php echo htmlspecialchars($profilUser["nev"]); ?>
+                            <?php if (!empty($profilUser["nem"]) && $profilUser["nem"] === "no"): ?>
+                                <span class="nem-ikon nem-no" title="Nő">♀</span>
+                            <?php elseif (!empty($profilUser["nem"]) && $profilUser["nem"] === "ferfi"): ?>
+                                <span class="nem-ikon nem-ferfi" title="Férfi">♂</span>
+                            <?php endif; ?>
+                        </h1>
                         <?php if (!$sajatProfil): ?>
                             <a href="kozosseg.php" class="vissza-kozosseg">← Vissza a közösséghez</a>
                             <p id="baratAllapotUzenet"></p>
@@ -306,11 +313,6 @@ function profilUrl($params, $overrides = []) {
                 </div>
                 <p class="naptar-jelmagy">A kitöltött napok az edzéseket jelölik.</p>
             </div>
-            <?php if (!empty($profilUser["nem"]) && isset($nemSzoveg[$profilUser["nem"]])): ?>
-            <div class="profil-card profil-nem-mas">
-                <p><span class="label">Nem:</span> <?php echo htmlspecialchars($nemSzoveg[$profilUser["nem"]]); ?></p>
-            </div>
-            <?php endif; ?>
             </div>
             </div>
             <?php endif; ?>

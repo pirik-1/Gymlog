@@ -21,3 +21,80 @@ if (navToggle && navMenu) {
         a.addEventListener("click", () => { if (window.innerWidth <= 768) csukMenut(); });
     });
 }
+
+/* Komment hozzáadás és törlés */
+document.querySelectorAll(".komment-uj-form").forEach(form => {
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const posztId = parseInt(form.dataset.posztId, 10);
+        const input = form.querySelector('input[name="tartalom"]');
+        const tartalom = (input && input.value) ? input.value.trim() : "";
+        if (!tartalom) return;
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        try {
+            const res = await fetch("poszt_komment_add.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ poszt_id: posztId, tartalom })
+            });
+            const data = await res.json();
+            if (data.siker && data.komment) {
+                const li = document.createElement("li");
+                li.className = "komment-elem";
+                li.dataset.kommentId = data.komment.id;
+                let delBtn = "";
+                if (window.gymlogAdmin) delBtn = '<button type="button" class="komment-torles-gomb" title="Törlés">✕</button>';
+                li.innerHTML = `<span class="komment-szerzo">${escapeHtml(data.komment.felhasznaloNev)}</span>
+                    <span class="komment-datum">${escapeHtml(data.komment.datum)}</span>${delBtn}
+                    <span class="komment-tartalom">${escapeHtml(data.komment.tartalom)}</span>`;
+                if (window.gymlogAdmin) {
+                    li.querySelector(".komment-torles-gomb")?.addEventListener("click", function() {
+                        torlesGombKattint(this);
+                    });
+                }
+                const lista = form.closest(".poszt-kommentek").querySelector(".komment-lista");
+                if (lista) lista.appendChild(li);
+                if (input) input.value = "";
+            } else {
+                alert(data.uzenet || "Hiba a küldéskor.");
+            }
+        } catch (err) {
+            alert("Hiba a kapcsolat során.");
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    });
+});
+
+async function torlesGombKattint(btn) {
+        const li = btn.closest(".komment-elem");
+        const kommentId = li ? parseInt(li.dataset.kommentId, 10) : 0;
+        if (!kommentId || !confirm("Biztosan törölni szeretnéd a kommentet?")) return;
+        btn.disabled = true;
+        try {
+            const res = await fetch("poszt_komment_torles.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ komment_id: kommentId })
+            });
+            const data = await res.json();
+            if (data.siker && li) li.remove();
+            else alert(data.uzenet || "Hiba a törléskor.");
+        } catch (err) {
+            alert("Hiba a kapcsolat során.");
+        } finally {
+            btn.disabled = false;
+        }
+}
+
+document.querySelectorAll(".komment-torles-gomb").forEach(btn => {
+    btn.addEventListener("click", () => torlesGombKattint(btn));
+});
+
+function escapeHtml(s) {
+    if (!s) return "";
+    const div = document.createElement("div");
+    div.textContent = s;
+    return div.innerHTML;
+}
