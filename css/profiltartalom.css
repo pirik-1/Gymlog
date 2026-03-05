@@ -229,39 +229,75 @@
 .profil-adatok-form label { display: block; font-size: 13px; margin-bottom: 3px; }
 .profil-adatok-form input,
 .profil-adatok-form select {
+	background-color: rgb(172, 191, 164);;
+	border: 2px solid rgba(217, 217, 217, 0.4);
+	outline: none;
+	transition: all 0.2s ease;
+
     width: 100%;
     padding: 8px 12px;
     border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.4);
-    background: rgba(0,0,0,0.3);
     color: white;
     font-size: 15px;
     box-sizing: border-box;
 }
+.profil-adatok-form .form-sor:nth-child(3) select {
+    background-color: rgb(172, 191, 164);
+}
+.profil-adatok-form input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+.profil-adatok-form input:focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 5px rgb(255, 255, 255);
+}
 .profil-adatok-form .mentes-gomb-kicsi {
     padding: 8px 16px;
     margin-top: 4px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
+    font-size: 13px;
+    border-radius: 20px;
+    font-weight: bold;
+    background-color: rgb(85, 107, 47, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     color: white;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 15px;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+.profil-adatok-form .mentes-gomb-kicsi:hover { 
+    background: rgb(85, 107, 47);     
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+.profil-adatok-form .mentes-gomb-kicsi:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 .profil-adatok-form .form-uzenet { font-size: 12px; margin-top: 6px; }
 
 /* Kalória kalkulátor gomb */
 .kaloria-kalkulator-gomb {
+    font-weight: bold;
     padding: 12px 20px;
-    border-radius: 12px;
-    background: rgba(110, 181, 255, 0.25);
-    border: 1px solid rgba(110, 181, 255, 0.5);
+    border-radius: 20px;
+    background-color: rgb(85, 107, 47, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     color: white;
     cursor: pointer;
     font-size: 15px;
     width: 100%;
+    transition: all 0.3s ease;
 }
-.kaloria-kalkulator-gomb:hover { background: rgba(110, 181, 255, 0.4); }
+.kaloria-kalkulator-gomb:hover { 
+    background: rgb(85, 107, 47);     
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+.kaloria-kalkulator-gomb:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
 
 /* Naptár */
 .profil-naptar h2 { margin-top: 0; }
@@ -307,7 +343,7 @@
     background: rgba(255,255,255,0.08);
     font-size: 13px;
 }
-.naptar-nap.edzett { background: rgba(110, 181, 255, 0.4); }
+.naptar-nap.edzett { background-color: rgb(85, 107, 47, 0.5);; }
 .naptar-jelmagy { font-size: 12px; opacity: 0.7; margin-top: 10px; }
 
 /* Edzések lista */
@@ -316,11 +352,27 @@
 .edzes-lista li:last-child { border-bottom: none; }
 .edzes-lista a {
     display: block;
-    padding: 12px 0;
-    color: white;
+    padding: 12px 10px;
     text-decoration: none;
+    border-radius: 20px;
+    background-color: rgb(85, 107, 47, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
 }
-.edzes-lista a:hover { background: rgba(255,255,255,0.08); }
+.edzes-lista a:hover { 
+    background: rgb(85, 107, 47);     
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+.edzes-lista a:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+/* .edzes-lista a:hover { background: rgba(255,255,255,0.08); } */
 .edzes-lista .edzes-nev { display: block; font-weight: 600; margin-bottom: 4px; }
 .edzes-lista .edzes-meta { font-size: 13px; opacity: 0.85; }
 .ures-hint { font-size: 14px; opacity: 0.85; }
@@ -340,13 +392,14 @@
 }
 .popup-overlay.open { opacity: 1; visibility: visible; }
 .popup-kalkulator {
-    background: rgba(0,0,0,0.85);
+    background-color: rgb(226,232,206);
     border-radius: 20px;
     padding: 24px 28px;
     border: 1px solid rgba(255,255,255,0.2);
     max-width: 380px;
     width: 90%;
     position: relative;
+    color: rgb(60, 75, 33) !important;
 }
 .popup-close {
     position: absolute;
@@ -356,7 +409,7 @@
     height: 32px;
     border: none;
     background: transparent;
-    color: white;
+    /* color: white; */
     font-size: 24px;
     cursor: pointer;
     line-height: 1;
@@ -369,22 +422,47 @@
     width: 100%;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.4);
-    background: rgba(0,0,0,0.3);
-    color: white;
     font-size: 15px;
     box-sizing: border-box;
+    background-color: rgb(172, 191, 164);
+	border: 2px solid rgba(217, 217, 217, 0.4);
+	color: white;
+	outline: none;
+	transition: all 0.2s ease;
 }
+.kalkulator-form input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.kalkulator-form input:focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 5px rgb(255, 255, 255);
+}
+
 .kalkulator-form #kalkSzamit {
     padding: 10px 20px;
     margin-top: 8px;
     border-radius: 10px;
-    background: rgba(110, 181, 255, 0.3);
-    border: 1px solid rgba(110, 181, 255, 0.5);
+
+    border-radius: 20px;
+    background-color: rgb(85, 107, 47, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     color: white;
     cursor: pointer;
     font-size: 15px;
+    width: 100%;
+    transition: all 0.3s ease;
 }
+.kalkulator-form #kalkSzamit:hover { 
+    background: rgb(85, 107, 47);     
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+.kalkulator-form #kalkSzamit:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
 .kalk-eredmeny { margin-top: 16px; font-size: 14px; line-height: 1.5; }
 
 @media (max-width: 480px) {

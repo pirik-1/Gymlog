@@ -75,7 +75,7 @@ $sorok = json_decode($edzes["leiras"], true) ?: [];
                         <p id="mentesUzenet"></p>
                     <?php endif; ?>
                 </article>
-                <p><a href="index.php" class="vissza-link">← Vissza a bejegyzésekhez</a></p>
+                <p><a href="index.php" class="vissza-link">Vissza a bejegyzésekhez</a></p>
             </section>
             <aside class="friends-box">
                 <h2>Részletek</h2>
@@ -103,7 +103,7 @@ $sorok = json_decode($edzes["leiras"], true) ?: [];
                 const data = await response.json();
 
                 if (data.siker) {
-                    uzenet.style.color = "lightgreen";
+                    uzenet.style.color = "red";
                     uzenet.textContent = data.uzenet || "Edzésterv sikeresen mentve!";
                 } else {
                     uzenet.style.color = "red";

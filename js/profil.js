@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
 
             if (uzenet) {
-                uzenet.style.color = data.siker ? "lightgreen" : "orange";
+                uzenet.style.color = data.siker ? "green" : "red";
                 uzenet.textContent = data.uzenet || "";
             }
             if (data.siker) {

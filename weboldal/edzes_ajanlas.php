@@ -26,8 +26,47 @@ $statusSzoveg = ["pending" => "Függőben", "approved" => "Jóváhagyva", "rejec
     <style>
         .ajanlas-card { border-radius: 20px; padding: 24px; margin-bottom: 20px; background-color: rgb(172,191,164);}
         .ajanlas-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
-        .ajanlas-form input { flex: 1; min-width: 180px; padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.3); color: white; }
-        .ajanlas-form button { padding: 10px 24px; border-radius: 12px; background: rgba(110,181,255,0.3); border: 1px solid rgba(110,181,255,0.5); color: white; cursor: pointer; }
+        .ajanlas-form input {
+            background-color: rgb(250, 243, 225, 0.2);
+            border: 2px solid rgba(217, 217, 217, 0.4);
+            outline: none;
+            transition: all 0.2s ease;
+            flex: 1; 
+            min-width: 180px; 
+            padding: 10px 14px; 
+            border-radius: 12px;
+            color: white;
+        }
+        .ajanlas-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .ajanlas-form input:focus {
+            border-color: #ffffff;
+            box-shadow: 0 0 5px rgb(255, 255, 255);
+        }
+
+        .ajanlas-form button { 
+            padding: 10px 24px; 
+            border-radius: 20px;
+            background-color: rgb(85, 107, 47, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        .ajanlas-form button:hover { 
+            background: rgb(85, 107, 47);     
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+        .ajanlas-form button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
         .ajanlas-lista { list-style: none; padding: 0; margin: 16px 0 0; }
         .ajanlas-lista li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .ajanlas-lista li:last-child { border-bottom: none; }
@@ -139,7 +178,7 @@ document.getElementById("ajanlasKuldes")?.addEventListener("click", async () => 
     const nev = (input?.value || "").trim();
     if (!nev) {
         uzenet.textContent = "Adj meg egy gyakorlatnevet!";
-        uzenet.style.color = "orange";
+        uzenet.style.color = "red";
         return;
     }
     try {

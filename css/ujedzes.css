@@ -142,7 +142,10 @@
     margin-top: 10px;
     padding: 10px;
     border-radius: 16px;
-    background: rgba(0, 0, 0, 0.15);
+    /* background-color: rgb(150, 160, 130); */
+    background: rgb(47, 58, 47);
+    color: white;
+
     max-height: 260px;
     overflow-y: auto;
     box-sizing: border-box;
@@ -160,7 +163,7 @@
     margin-bottom: 16px;
     padding: 12px 14px;
     border-radius: 14px;
-    background: rgba(0,0,0,0.25);
+    /* background: rgba(0,0,0,0.1); */
     border: 1px solid rgba(255,255,255,0.2);
 }
 
@@ -206,7 +209,7 @@
 }
 
 .edzes-blokk .szet-hozzaad {
-    background: rgba(110, 181, 255, 0.25);
+    background: none;
 }
 
 .szettek-lista {
@@ -442,6 +445,16 @@ button.szet-pipa{
     cursor: pointer;
     margin-bottom: 6px;
     font-size: 14px;
+}
+.gyakorlat-item:hover { 
+    background: rgb(85, 107, 47);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+}
+.gyakorlat-item:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 @media (max-width: 768px) {
