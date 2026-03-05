@@ -200,7 +200,8 @@ ul:not(.fooldal-body ul) li a:hover {
     margin-bottom: 8px;
 }
 .fooldal-body .friends-lista a {
-    color: #6eb5ff;
+    color: rgb(60, 75, 33);
+    opacity: 0.7;
     text-decoration: none;
 }
 .fooldal-body .friends-lista a:hover {
@@ -273,7 +274,7 @@ ul:not(.fooldal-body ul) li a:hover {
     padding: 10px 20px;
     text-decoration: none;
     border-radius: 20px;
-    background-color: rgb(85, 107, 47, 0.65);
+    background: rgba(80,200,80,0.4); 
     border: 1px solid rgba(255, 255, 255, 0.4);
     color: white;
     cursor: pointer;
@@ -282,7 +283,7 @@ ul:not(.fooldal-body ul) li a:hover {
     transition: all 0.3s ease;
 }
 .fooldal-body .terv-inditas-gomb:hover { 
-    background: rgb(85, 107, 47);     
+    background-color:  rgb(70, 200, 70);   
     transform: translateY(-1px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.25);
 }

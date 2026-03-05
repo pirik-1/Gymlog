@@ -167,7 +167,8 @@
 }
 
 .profil-friends ul.friends-list a {
-    color: #6eb5ff;
+    color: rgb(60, 75, 33);
+    opacity: 0.7;
     text-decoration: none;
 }
 .profil-friends ul.friends-list a:hover {
@@ -424,7 +425,6 @@
     font-size: 15px;
     box-sizing: border-box;
 }
-.edzes-szurok .szuro-select option {background-color: #6eb5ff; }
 
 /* Edzések lista */
 .edzes-lista { list-style: none; padding: 0; margin: 0 0 20px 0; overflow: visible; }
