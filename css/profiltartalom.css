@@ -71,13 +71,15 @@
 }
 
 @media (max-width: 900px) {
+    .profil-fo{margin-top: 10vw;}
     .profil-shell { grid-template-columns: 1fr; }
     .profil-tartalom-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
     .profil-main { margin: 16px 10px; }
-    .profil-card { padding: 16px; }
+    .profil-card { padding: 16px;}
+    /* .profil-card:first-child {margin-top: 100px;} */
     .fej-sor { flex-direction: column; gap: 12px; }
     .fej-statok { flex-wrap: wrap; }
     .naptar-grid { gap: 4px; }
@@ -396,13 +398,18 @@
     max-width: 220px;
     padding: 8px 14px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.35);
     color: white;
-    font-size: 14px;
     cursor: pointer;
+
+    background-color: rgb(172, 191, 164);
+    border: 2px solid rgba(217, 217, 217, 0.4);
+    outline: none;
+    transition: all 0.2s ease;
+    width: 100%;
+    font-size: 15px;
+    box-sizing: border-box;
 }
-.edzes-szurok .szuro-select option { color: #333; background: #fff; }
+.edzes-szurok .szuro-select option {background-color: #6eb5ff; }
 
 /* Edzések lista */
 .edzes-lista { list-style: none; padding: 0; margin: 0; }

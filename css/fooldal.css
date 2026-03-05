@@ -1,9 +1,5 @@
-    /* Alapértelmezett háttér */
 html { overflow-x: hidden; }
 body {
-    /* background-image: url(../img/moonlit-asteroid.jpg);
-    background-attachment: fixed;
-    background-size: cover; */
     background-color: rgb(226,232,206);
     color: rgb(60, 75, 33);
 }
@@ -470,6 +466,7 @@ ul:not(.fooldal-body ul) li a:hover {
 }
 
 @media (max-width: 768px) {
+    html{margin-top: 10vw;}
     .home-btn {
         padding-left: 25vw;
         padding-top: 1.7vw;
