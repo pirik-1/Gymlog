@@ -1,309 +1,257 @@
 <?php
-// Helper függvények
+// Egyszerű segédfüggvények
 
-function getTervAdatok($conn, $tervId, $userId) {
-    $check = $conn->query("SHOW TABLES LIKE 'edzesterv_mentes'");
-    if (!$check || $check->num_rows === 0) {
-        return null;
-    }
-    
-    $stmt = $conn->prepare("SELECT nev, tartalom FROM edzesterv_mentes WHERE id = ? AND felhasznaloId = ?");
-    if (!$stmt) {
-        return null;
-    }
-    
-    $stmt->bind_param("ii", $tervId, $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($row = $result->fetch_assoc()) {
-        return [
-            "nev" => $row["nev"],
-            "tartalom" => json_decode($row["tartalom"], true) ?: []
-        ];
-    }
-    
-    return null;
+function tervLekeres($conn, $tervId, $felhasznaloId) {
+    $lekerdezes = $conn->prepare("SELECT nev, tartalom FROM edzesterv_mentes WHERE id = ? AND felhasznaloId = ?");
+    $lekerdezes->bind_param("ii", $tervId, $felhasznaloId);
+    $lekerdezes->execute();
+    $sor = $lekerdezes->get_result()->fetch_assoc();
+    if (!$sor) return null;
+    return ["nev" => $sor["nev"], "tartalom" => json_decode($sor["tartalom"], true) ?: []];
 }
 
-function getTervek($conn, $userId) {
-    $tervek = [];
-    $check = $conn->query("SHOW TABLES LIKE 'edzesterv_mentes'");
-    
-    if ($check && $check->num_rows > 0) {
-        $stmt = $conn->prepare("SELECT id, nev, tartalom, letrehozva FROM edzesterv_mentes WHERE felhasznaloId = ? ORDER BY letrehozva DESC");
-        if ($stmt) {
-            $stmt->bind_param("i", $userId);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            while ($row = $result->fetch_assoc()) {
-                $tervek[] = $row;
-            }
-        }
-    }
-    
-    return $tervek;
+function tervekLekeres($conn, $felhasznaloId) {
+    $lista = [];
+    $lekerdezes = $conn->prepare("SELECT id, nev, tartalom, letrehozva FROM edzesterv_mentes WHERE felhasznaloId = ? ORDER BY letrehozva DESC");
+    $lekerdezes->bind_param("i", $felhasznaloId);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
 }
 
-function getPosztok($conn, $limit = 50, $userId = null, $csakBaratok = false) {
-    $posztok = [];
-    $check = $conn->query("SHOW TABLES LIKE 'poszt'");
-    if (!$check || $check->num_rows === 0) {
-        return $posztok;
-    }
-    $hasEdzesId = false;
-    $cols = $conn->query("SHOW COLUMNS FROM poszt LIKE 'edzesId'");
-    if ($cols && $cols->num_rows > 0) {
-        $hasEdzesId = true;
-    }
-    $sel = $hasEdzesId 
-        ? "SELECT p.id, p.tartalom, p.datum, p.felhasznaloId, p.edzesId, f.nev as felhasznaloNev"
-        : "SELECT p.id, p.tartalom, p.datum, p.felhasznaloId, NULL as edzesId, f.nev as felhasznaloNev";
-    $where = "";
-    $types = "";
-    $params = [];
-    if ($csakBaratok && $userId !== null) {
-        $baratok = getBaratok($conn, (int)$userId);
-        $engedelyezettIds = [(int)$userId];
-        foreach ($baratok as $b) {
-            $engedelyezettIds[] = (int)$b["id"];
-        }
-        $placeholders = implode(",", array_fill(0, count($engedelyezettIds), "?"));
-        $where = " WHERE p.felhasznaloId IN (" . $placeholders . ")";
-        $types = str_repeat("i", count($engedelyezettIds));
-        $params = $engedelyezettIds;
-    }
-    $limitVal = (int)$limit;
-    if (!empty($params)) {
-        $stmt = $conn->prepare($sel . " FROM poszt p JOIN felhasznalo f ON f.id = p.felhasznaloId" . $where . " ORDER BY p.datum DESC LIMIT ?");
-        if ($stmt) {
-            $params[] = $limitVal;
-            $types .= "i";
-            $stmt->bind_param($types, ...$params);
-            $stmt->execute();
-            $res = $stmt->get_result();
-            while ($row = $res->fetch_assoc()) {
-                $posztok[] = $row;
-            }
-        }
+function posztokLekeres($conn, $limit, $felhasznaloId = null, $csakBaratok = false) {
+    $lista = [];
+    $limit = (int)$limit;
+    if ($csakBaratok && $felhasznaloId) {
+        $baratok = baratokLekeres($conn, $felhasznaloId);
+        $engedelyezett = [$felhasznaloId];
+        foreach ($baratok as $b) $engedelyezett[] = $b["id"];
+        $helyek = implode(",", array_fill(0, count($engedelyezett), "?"));
+        $tipus = str_repeat("i", count($engedelyezett)) . "i";
+        $lekerdezes = $conn->prepare("SELECT p.id, p.tartalom, p.datum, p.felhasznaloId, p.edzesId, f.nev as felhasznaloNev FROM poszt p JOIN felhasznalo f ON f.id = p.felhasznaloId WHERE p.felhasznaloId IN ($helyek) ORDER BY p.datum DESC LIMIT ?");
+        $params = array_merge($engedelyezett, [$limit]);
+        $lekerdezes->bind_param($tipus, ...$params);
     } else {
-        $res = $conn->query($sel . " FROM poszt p JOIN felhasznalo f ON f.id = p.felhasznaloId" . $where . " ORDER BY p.datum DESC LIMIT " . $limitVal);
-        if ($res) {
-            while ($row = $res->fetch_assoc()) {
-                $posztok[] = $row;
-            }
-        }
+        $lekerdezes = $conn->prepare("SELECT p.id, p.tartalom, p.datum, p.felhasznaloId, p.edzesId, f.nev as felhasznaloNev FROM poszt p JOIN felhasznalo f ON f.id = p.felhasznaloId ORDER BY p.datum DESC LIMIT ?");
+        $lekerdezes->bind_param("i", $limit);
     }
-    return $posztok;
-}
-
-function gyakorlatAjanlasBeszuras($conn, $userId, $nev) {
-    $stmt = $conn->prepare("INSERT INTO gyakorlat_ajanlas (felhasznalo_id, nev) VALUES (?, ?)");
-    if (!$stmt) return false;
-    $stmt->bind_param("is", $userId, $nev);
-    return $stmt->execute();
-}
-
-function getSajatGyakorlatAjanlasok($conn, $userId) {
-    $lista = [];
-    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
-    if (!$check || $check->num_rows === 0) return $lista;
-    $stmt = $conn->prepare("SELECT id, nev, status, datum FROM gyakorlat_ajanlas WHERE felhasznalo_id = ? ORDER BY datum DESC");
-    if (!$stmt) return $lista;
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    while ($row = $res->fetch_assoc()) $lista[] = $row;
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
     return $lista;
 }
 
-function getFuggoGyakorlatAjanlasok($conn) {
+function gyakorlatAjanlasBeszur($conn, $felhasznaloId, $nev) {
+    $lekerdezes = $conn->prepare("INSERT INTO gyakorlat_ajanlas (felhasznalo_id, nev) VALUES (?, ?)");
+    $lekerdezes->bind_param("is", $felhasznaloId, $nev);
+    return $lekerdezes->execute();
+}
+
+function sajatAjanlasok($conn, $felhasznaloId) {
     $lista = [];
-    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
-    if (!$check || $check->num_rows === 0) return $lista;
-    $res = $conn->query("SELECT a.id, a.nev, a.datum, f.nev as felhasznalo_nev FROM gyakorlat_ajanlas a JOIN felhasznalo f ON f.id = a.felhasznalo_id WHERE a.status = 'pending' ORDER BY a.datum ASC");
-    if (!$res) return $lista;
-    while ($row = $res->fetch_assoc()) $lista[] = $row;
+    $lekerdezes = $conn->prepare("SELECT id, nev, status, datum FROM gyakorlat_ajanlas WHERE felhasznalo_id = ? ORDER BY datum DESC");
+    $lekerdezes->bind_param("i", $felhasznaloId);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
     return $lista;
 }
 
-function gyakorlatAjanlasStatusModosit($conn, $ajanlasId, $status, $isAdmin) {
-    if (!$isAdmin || !in_array($status, ['approved', 'rejected'])) return false;
-    $stmt = $conn->prepare("UPDATE gyakorlat_ajanlas SET status = ? WHERE id = ?");
-    if (!$stmt) return false;
-    $stmt->bind_param("si", $status, $ajanlasId);
-    return $stmt->execute();
-}
-
-function getJovahagyottGyakorlatok($conn) {
+function fuggoAjanlasok($conn) {
     $lista = [];
-    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
-    if (!$check || $check->num_rows === 0) return $lista;
-    $res = $conn->query("SELECT DISTINCT nev FROM gyakorlat_ajanlas WHERE status = 'approved' ORDER BY nev");
-    if (!$res) return $lista;
-    while ($row = $res->fetch_assoc()) $lista[] = $row["nev"];
+    $eredmeny = $conn->query("SELECT a.id, a.nev, a.datum, f.nev as felhasznalo_nev FROM gyakorlat_ajanlas a JOIN felhasznalo f ON f.id = a.felhasznalo_id WHERE a.status = 'pending' ORDER BY a.datum ASC");
+    if ($eredmeny) while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
     return $lista;
 }
 
-function getJovahagyottAjanlasokLista($conn) {
+function ajanlasStatus($conn, $ajanlasId, $status, $admin) {
+    if (!$admin || !in_array($status, ['approved', 'rejected'])) return false;
+    $lekerdezes = $conn->prepare("UPDATE gyakorlat_ajanlas SET status = ? WHERE id = ?");
+    $lekerdezes->bind_param("si", $status, $ajanlasId);
+    return $lekerdezes->execute();
+}
+
+function jovahagyottGyakorlatok($conn) {
     $lista = [];
-    $check = $conn->query("SHOW TABLES LIKE 'gyakorlat_ajanlas'");
-    if (!$check || $check->num_rows === 0) return $lista;
-    $res = $conn->query("SELECT a.id, a.nev, a.datum, f.nev as felhasznalo_nev FROM gyakorlat_ajanlas a JOIN felhasznalo f ON f.id = a.felhasznalo_id WHERE a.status = 'approved' ORDER BY a.nev, a.datum");
-    if (!$res) return $lista;
-    while ($row = $res->fetch_assoc()) $lista[] = $row;
+    $eredmeny = $conn->query("SELECT DISTINCT nev FROM gyakorlat_ajanlas WHERE status = 'approved' ORDER BY nev");
+    if ($eredmeny) while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor["nev"];
     return $lista;
 }
 
-function getOsszesGyakorlat($conn) {
-    $alap = [
-        "Arnold press", "Bicepsz curl", "Bicepsz hajlítás", "Calf emelés állva",
-        "Calf emelés ülve", "Döntött pad fekvenyomás", "Döntött pad mellhúzás",
-        "Egykezes sor", "Fej fölé nyomás", "Fekvenyomás", "Fekvenyomás szűk fogással",
-        "Felhúzás", "Felhúzás román", "Francia nyomás", "Guggolás", "Guggolás törzselés",
-        "Hamstring curl", "Hatcsípő gépen", "Húzódzkodás", "Kalapács hajlítás",
-        "Kézi súlyzós vállból nyomás", "Lábemelés", "Lefekvő lenyomás",
-        "Légtorna", "Mellgépen fekvés", "Oldalemelés", "Preacher curl",
-        "Reverse grip sor", "Rudat evezés", "Scott pad", "Shrug",
-        "Szűk fogású fekvenyomás", "Tolódzkodás", "Tricepsz letolás",
-        "Tricepsz kickback", "Vállból nyomás", "Vállból nyomás ülve",
-        "Vállemelés", "Vízesés", "W sit-up"
-    ];
-    $jovahagyott = getJovahagyottGyakorlatok($conn);
-    $osszes = array_unique(array_merge($alap, $jovahagyott));
-    sort($osszes, SORT_LOCALE_STRING);
+function jovahagyottAjanlasokLista($conn) {
+    $lista = [];
+    $eredmeny = $conn->query("SELECT a.id, a.nev, a.datum, f.nev as felhasznalo_nev FROM gyakorlat_ajanlas a JOIN felhasznalo f ON f.id = a.felhasznalo_id WHERE a.status = 'approved' ORDER BY a.nev, a.datum");
+    if ($eredmeny) while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
+}
+
+function baratiKerelmek($conn, $fogadoId) {
+    $lista = [];
+    $lekerdezes = $conn->prepare("SELECT b.id, b.kero_id, f.nev as kero_nev FROM baratsag b JOIN felhasznalo f ON f.id = b.kero_id WHERE b.fogado_id = ? AND b.status = 'pending' ORDER BY b.datum DESC");
+    $lekerdezes->bind_param("i", $fogadoId);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
+}
+
+function gyakorlatokLekeres($conn) {
+    $alap = ["Arnold press", "Bicepsz curl", "Döntött pad fekvenyomás", "Egykezes sor", "Fej fölé nyomás", "Fekvenyomás", "Felhúzás", "Felhúzás román", "Francia nyomás", "Guggolás", "Hamstring curl", "Húzódzkodás", "Kalapács hajlítás", "Lefekvő lenyomás", "Mellgépen fekvés", "Oldalemelés", "Rudat evezés", "Shrug", "Tolódzkodás", "Tricepsz letolás", "Vállból nyomás"];
+    $extra = jovahagyottGyakorlatok($conn);
+    $osszes = array_unique(array_merge($alap, $extra));
+    sort($osszes);
     return $osszes;
 }
 
-function getFelhasznalok($conn, $userId, $keres = "") {
-    $felhasznalok = [];
-    $keres = trim($keres);
-    $sql = "SELECT id, nev, email FROM felhasznalo WHERE id != ?";
-    $params = [$userId];
-    $types = "i";
+function felhasznalokLekeres($conn, $kijelentkezettId, $keres) {
+    $lista = [];
     if ($keres !== "") {
-        $sql .= " AND (nev LIKE ? OR email LIKE ?)";
-        $p = "%" . $keres . "%";
-        $params[] = $p;
-        $params[] = $p;
-        $types .= "ss";
+        $minta = "%" . $keres . "%";
+        $lekerdezes = $conn->prepare("SELECT id, nev, email FROM felhasznalo WHERE id != ? AND (nev LIKE ? OR email LIKE ?) ORDER BY nev");
+        $lekerdezes->bind_param("iss", $kijelentkezettId, $minta, $minta);
+    } else {
+        $lekerdezes = $conn->prepare("SELECT id, nev, email FROM felhasznalo WHERE id != ? ORDER BY nev");
+        $lekerdezes->bind_param("i", $kijelentkezettId);
     }
-    $sql .= " ORDER BY nev";
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) return $felhasznalok;
-    $stmt->bind_param($types, ...$params);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    while ($row = $res->fetch_assoc()) {
-        $felhasznalok[] = $row;
-    }
-    return $felhasznalok;
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
 }
 
-function getBaratiKerelmek($conn, $fogadoId) {
-    $kerelmek = [];
-    $check = $conn->query("SHOW TABLES LIKE 'baratsag'");
-    if (!$check || $check->num_rows === 0) return $kerelmek;
-    $stmt = $conn->prepare("SELECT b.id, b.kero_id, f.nev as kero_nev FROM baratsag b JOIN felhasznalo f ON f.id = b.kero_id WHERE b.fogado_id = ? AND b.status = 'pending' ORDER BY b.datum DESC");
-    if (!$stmt) return $kerelmek;
-    $stmt->bind_param("i", $fogadoId);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    while ($row = $res->fetch_assoc()) {
-        $kerelmek[] = $row;
-    }
-    return $kerelmek;
+function baratokLekeres($conn, $felhasznaloId) {
+    $lista = [];
+    $lekerdezes = $conn->prepare("SELECT f.id, f.nev FROM baratsag b JOIN felhasznalo f ON (f.id = b.kero_id OR f.id = b.fogado_id) AND f.id != ? WHERE (b.kero_id = ? OR b.fogado_id = ?) AND b.status = 'accepted' ORDER BY f.nev");
+    $lekerdezes->bind_param("iii", $felhasznaloId, $felhasznaloId, $felhasznaloId);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
 }
 
-function getBaratok($conn, $userId) {
-    $baratok = [];
-    $check = $conn->query("SHOW TABLES LIKE 'baratsag'");
-    if (!$check || $check->num_rows === 0) return $baratok;
-    $stmt = $conn->prepare("SELECT f.id, f.nev FROM baratsag b JOIN felhasznalo f ON (f.id = b.kero_id OR f.id = b.fogado_id) AND f.id != ? WHERE (b.kero_id = ? OR b.fogado_id = ?) AND b.status = 'accepted' ORDER BY f.nev");
-    if (!$stmt) return $baratok;
-    $stmt->bind_param("iii", $userId, $userId, $userId);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    while ($row = $res->fetch_assoc()) {
-        $baratok[] = $row;
-    }
-    return $baratok;
+function baratsagAllapot($conn, $felhasznaloId, $masikId) {
+    $lekerdezes = $conn->prepare("SELECT status, kero_id FROM baratsag WHERE (kero_id = ? AND fogado_id = ?) OR (kero_id = ? AND fogado_id = ?)");
+    $lekerdezes->bind_param("iiii", $felhasznaloId, $masikId, $masikId, $felhasznaloId);
+    $lekerdezes->execute();
+    return $lekerdezes->get_result()->fetch_assoc();
 }
 
-function getBaratsagAllapot($conn, $userId, $masikId) {
-    $check = $conn->query("SHOW TABLES LIKE 'baratsag'");
-    if (!$check || $check->num_rows === 0) return null;
-    $stmt = $conn->prepare("SELECT status, kero_id FROM baratsag WHERE (kero_id = ? AND fogado_id = ?) OR (kero_id = ? AND fogado_id = ?)");
-    if (!$stmt) return null;
-    $stmt->bind_param("iiii", $userId, $masikId, $masikId, $userId);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    if ($row = $res->fetch_assoc()) {
-        return $row;
-    }
-    return null;
+function felhasznaloLekeres($conn, $id) {
+    $lekerdezes = $conn->prepare("SELECT id, nev, email, magassag, testsuly, nem FROM felhasznalo WHERE id = ?");
+    $lekerdezes->bind_param("i", $id);
+    $lekerdezes->execute();
+    return $lekerdezes->get_result()->fetch_assoc();
 }
 
-function getFelhasznaloById($conn, $id) {
-    $stmt = $conn->prepare("SELECT id, nev, email, magassag, testsuly, nem FROM felhasznalo WHERE id = ?");
-    if (!$stmt) return null;
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_assoc();
-}
-
-function getProfilStat($conn, $userId, $tipus) {
-    if ($tipus === 'edzes') {
-        $check = $conn->query("SHOW TABLES LIKE 'edzes'");
-        if (!$check || $check->num_rows === 0) return 0;
-        $r = $conn->query("SELECT COUNT(*) as c FROM edzes WHERE felhasznaloId = " . (int)$userId);
-        return $r ? (int)$r->fetch_assoc()["c"] : 0;
+function profilStat($conn, $felhasznaloId, $tipus) {
+    if ($tipus === "edzes") {
+        $eredmeny = $conn->query("SELECT COUNT(*) as db FROM edzes WHERE felhasznaloId = " . (int)$felhasznaloId);
+        return $eredmeny ? (int)$eredmeny->fetch_assoc()["db"] : 0;
     }
-    if ($tipus === 'barat') {
-        return count(getBaratok($conn, $userId));
-    }
+    if ($tipus === "barat") return count(baratokLekeres($conn, $felhasznaloId));
     return 0;
 }
 
-function getProfilEdzesek($conn, $userId, $limit = 50, $honapYm = null) {
-    $edzesek = [];
-    $check = $conn->query("SHOW TABLES LIKE 'edzes'");
-    if (!$check || $check->num_rows === 0) return $edzesek;
-    if ($honapYm) {
-        $honapStart = $honapYm . "-01";
-        $honapEnd = $honapYm . "-" . date("t", strtotime($honapStart . " 12:00:00"));
-        $stmt = $conn->prepare("SELECT id, nev, datum, idotartam, osszsuly FROM edzes WHERE felhasznaloId = ? AND datum >= ? AND datum <= ? ORDER BY datum DESC, id DESC");
-        if (!$stmt) return $edzesek;
-        $stmt->bind_param("iss", $userId, $honapStart, $honapEnd);
-    } else {
-        $stmt = $conn->prepare("SELECT id, nev, datum, idotartam, osszsuly FROM edzes WHERE felhasznaloId = ? ORDER BY datum DESC, id DESC LIMIT ?");
-        if (!$stmt) return $edzesek;
-        $l = (int)$limit;
-        $stmt->bind_param("ii", $userId, $l);
+function profilEdzesek($conn, $felhasznaloId, $limit, $honap, $tervId, $tervNev) {
+    $lista = [];
+    $hol = ["felhasznaloId = ?"];
+    $params = [$felhasznaloId];
+    $tipus = "i";
+    if ($honap && $honap !== "osszes") {
+        $kezdete = $honap . "-01";
+        $vege = $honap . "-" . date("t", strtotime($kezdete . " 12:00:00"));
+        $hol[] = "datum >= ?";
+        $hol[] = "datum <= ?";
+        $params[] = $kezdete;
+        $params[] = $vege;
+        $tipus .= "ss";
     }
-    $stmt->execute();
-    $res = $stmt->get_result();
-    while ($row = $res->fetch_assoc()) $edzesek[] = $row;
-    return $edzesek;
+    if ($tervId && $tervNev) {
+        $hol[] = "(edzestervMentesId = ? OR (edzestervMentesId IS NULL AND nev = ?))";
+        $params[] = $tervId;
+        $params[] = $tervNev;
+        $tipus .= "is";
+    }
+    $sql = "SELECT id, nev, datum, idotartam, osszsuly FROM edzes WHERE " . implode(" AND ", $hol) . " ORDER BY datum DESC, id DESC";
+    if (!$honap || $honap === "osszes") {
+        $sql .= " LIMIT ?";
+        $params[] = (int)$limit;
+        $tipus .= "i";
+    }
+    $lekerdezes = $conn->prepare($sql);
+    $lekerdezes->bind_param($tipus, ...$params);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
 }
 
-function getEdzesNapokHonap($conn, $userId, $honapYm = null) {
-    $napok = [];
-    $check = $conn->query("SHOW TABLES LIKE 'edzes'");
-    if (!$check || $check->num_rows === 0) return $napok;
-    if (!$honapYm) $honapYm = date("Y-m", strtotime("-1 month"));
-    $honapStart = $honapYm . "-01";
-    $honapEnd = $honapYm . "-" . date("t", strtotime($honapStart . " 12:00:00"));
-    $stmt = $conn->prepare("SELECT DISTINCT DATE(datum) as nap FROM edzes WHERE felhasznaloId = ? AND datum >= ? AND datum <= ?");
-    if (!$stmt) return $napok;
-    $stmt->bind_param("iss", $userId, $honapStart, $honapEnd);
-    $stmt->execute();
-    $res = $stmt->get_result();
-    while ($row = $res->fetch_assoc()) $napok[] = $row["nap"];
-    return $napok;
+function edzesHonapok($conn, $felhasznaloId, $tervId, $tervNev, $limit) {
+    $lista = [];
+    $sql = "SELECT DISTINCT DATE_FORMAT(datum, '%Y-%m') as honap FROM edzes WHERE felhasznaloId = ?";
+    $params = [$felhasznaloId];
+    $tipus = "i";
+    if ($tervId && $tervNev) {
+        $sql .= " AND (edzestervMentesId = ? OR (edzestervMentesId IS NULL AND nev = ?))";
+        $params[] = $tervId;
+        $params[] = $tervNev;
+        $tipus .= "is";
+    }
+    $sql .= " ORDER BY honap DESC LIMIT ?";
+    $params[] = (int)$limit;
+    $tipus .= "i";
+    $lekerdezes = $conn->prepare($sql);
+    $lekerdezes->bind_param($tipus, ...$params);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor["honap"];
+    return $lista;
 }
 
-function formatGyakorlatReszletek($sor) {
+function edzesNapok($conn, $felhasznaloId, $honap, $tervId, $tervNev) {
+    $lista = [];
+    if (!$honap) $honap = date("Y-m");
+    $kezdete = $honap . "-01";
+    $vege = $honap . "-" . date("t", strtotime($kezdete . " 12:00:00"));
+    $sql = "SELECT DISTINCT DATE(datum) as nap FROM edzes WHERE felhasznaloId = ? AND datum >= ? AND datum <= ?";
+    $params = [$felhasznaloId, $kezdete, $vege];
+    $tipus = "iss";
+    if ($tervId && $tervNev) {
+        $sql .= " AND (edzestervMentesId = ? OR (edzestervMentesId IS NULL AND nev = ?))";
+        $params[] = $tervId;
+        $params[] = $tervNev;
+        $tipus .= "is";
+    }
+    $lekerdezes = $conn->prepare($sql);
+    $lekerdezes->bind_param($tipus, ...$params);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor["nap"];
+    return $lista;
+}
+
+function edzesekNap($conn, $felhasznaloId, $datum, $tervId, $tervNev) {
+    $lista = [];
+    $sql = "SELECT id, nev, datum, idotartam, osszsuly FROM edzes WHERE felhasznaloId = ? AND DATE(datum) = ?";
+    $params = [$felhasznaloId, $datum];
+    $tipus = "is";
+    if ($tervId && $tervNev) {
+        $sql .= " AND (edzestervMentesId = ? OR (edzestervMentesId IS NULL AND nev = ?))";
+        $params[] = $tervId;
+        $params[] = $tervNev;
+        $tipus .= "is";
+    }
+    $sql .= " ORDER BY id";
+    $lekerdezes = $conn->prepare($sql);
+    $lekerdezes->bind_param($tipus, ...$params);
+    $lekerdezes->execute();
+    $eredmeny = $lekerdezes->get_result();
+    while ($sor = $eredmeny->fetch_assoc()) $lista[] = $sor;
+    return $lista;
+}
+
+function gyakorlatSzoveg($sor) {
     if (isset($sor["szettek"]) && is_array($sor["szettek"])) {
         $reszletek = [];
         foreach ($sor["szettek"] as $i => $sz) {
@@ -316,13 +264,35 @@ function formatGyakorlatReszletek($sor) {
         }
         return !empty($reszletek) ? " – " . implode(", ", $reszletek) : "";
     }
-    $set = isset($sor["set"]) ? (int)$sor["set"] : 0;
-    $rep = isset($sor["rep"]) ? (int)$sor["rep"] : 0;
-    $suly = isset($sor["suly"]) ? (int)$sor["suly"] : 0;
+    $set = (int)($sor["set"] ?? 0);
+    $rep = (int)($sor["rep"] ?? 0);
+    $suly = (int)($sor["suly"] ?? 0);
     $reszletek = [];
-    if ($set > 0)  $reszletek[] = $set . "x";
-    if ($rep > 0)  $reszletek[] = $rep . " ismétlés";
+    if ($set > 0) $reszletek[] = $set . "x";
+    if ($rep > 0) $reszletek[] = $rep . " ismétlés";
     if ($suly > 0) $reszletek[] = $suly . " kg";
     return !empty($reszletek) ? " – " . implode(", ", $reszletek) : "";
 }
-?>
+
+// Régi függvénynevek (kompatibilitás)
+function gyakorlatAjanlasBeszuras($c, $uid, $n) { return gyakorlatAjanlasBeszur($c, $uid, $n); }
+function getSajatGyakorlatAjanlasok($c, $uid) { return sajatAjanlasok($c, $uid); }
+function getFuggoGyakorlatAjanlasok($c) { return fuggoAjanlasok($c); }
+function gyakorlatAjanlasStatusModosit($c, $id, $s, $a) { return ajanlasStatus($c, $id, $s, $a); }
+function getJovahagyottGyakorlatok($c) { return jovahagyottGyakorlatok($c); }
+function getJovahagyottAjanlasokLista($c) { return jovahagyottAjanlasokLista($c); }
+function getBaratiKerelmek($c, $fid) { return baratiKerelmek($c, $fid); }
+function getTervAdatok($c, $tid, $uid) { return tervLekeres($c, $tid, $uid); }
+function getTervek($c, $uid) { return tervekLekeres($c, $uid); }
+function getPosztok($c, $l, $uid = null, $cb = false) { return posztokLekeres($c, $l, $uid, $cb); }
+function getOsszesGyakorlat($c) { return gyakorlatokLekeres($c); }
+function getFelhasznalok($c, $uid, $k = "") { return felhasznalokLekeres($c, $uid, $k); }
+function getBaratok($c, $uid) { return baratokLekeres($c, $uid); }
+function getBaratsagAllapot($c, $uid, $mid) { return baratsagAllapot($c, $uid, $mid); }
+function getFelhasznaloById($c, $id) { return felhasznaloLekeres($c, $id); }
+function getProfilStat($c, $uid, $t) { return profilStat($c, $uid, $t); }
+function getProfilEdzesek($c, $uid, $l, $h, $tid = null, $tn = null) { return profilEdzesek($c, $uid, $l, $h, $tid, $tn); }
+function getEdzesHonapok($c, $uid, $tid = null, $tn = null, $l = 24) { return edzesHonapok($c, $uid, $tid, $tn, $l); }
+function getEdzesNapokHonap($c, $uid, $h = null, $tid = null, $tn = null) { return edzesNapok($c, $uid, $h, $tid, $tn); }
+function getEdzesekNap($c, $uid, $d, $tid = null, $tn = null) { return edzesekNap($c, $uid, $d, $tid, $tn); }
+function formatGyakorlatReszletek($s) { return gyakorlatSzoveg($s); }

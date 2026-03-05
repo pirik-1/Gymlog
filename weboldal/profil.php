@@ -25,9 +25,11 @@ $edzesNapok = [];
 $valasztottHonap = null;
 $honapNevek = ["", "január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december"];
 
-// Honap param: YYYY-MM, max mai hónap
+// Honap param: YYYY-MM, "osszes", max mai hónap
 $honapParam = trim($_GET["honap"] ?? "");
-if (preg_match('/^\d{4}-\d{2}$/', $honapParam)) {
+if ($honapParam === "osszes") {
+    $valasztottHonap = "osszes";
+} elseif (preg_match('/^\d{4}-\d{2}$/', $honapParam)) {
     $honapTs = strtotime($honapParam . "-01");
     $maHonap = date("Y-m");
     if ($honapTs && date("Y-m", $honapTs) <= $maHonap) {
@@ -37,12 +39,24 @@ if (preg_match('/^\d{4}-\d{2}$/', $honapParam)) {
 if (!$valasztottHonap) {
     $valasztottHonap = date("Y-m");
 }
+$tervParam = isset($_GET["terv"]) ? (int)$_GET["terv"] : 0;
+$valasztottTervId = $tervParam > 0 ? $tervParam : null;
+$tervekLista = [];
+$valasztottTervNev = null;
 
 if ($profilUser) {
     $edzesDb = getProfilStat($conn, $profilUser["id"], "edzes");
     $baratDb = getProfilStat($conn, $profilUser["id"], "barat");
-    $edzesek = getProfilEdzesek($conn, $profilUser["id"], 100, $valasztottHonap);
-    $edzesNapok = getEdzesNapokHonap($conn, $profilUser["id"], $valasztottHonap);
+    $tervekLista = ($sajatProfil && $bejelentkezve) ? getTervek($conn, $userId) : [];
+    $valasztottTervNev = null;
+    if ($valasztottTervId && !empty($tervekLista)) {
+        foreach ($tervekLista as $t) {
+            if ((int)$t["id"] === $valasztottTervId) { $valasztottTervNev = $t["nev"] ?? ""; break; }
+        }
+    }
+    $edzesek = getProfilEdzesek($conn, $profilUser["id"], 200, $valasztottHonap, $valasztottTervId, $valasztottTervNev);
+    $honapNaptarhoz = ($valasztottHonap === "osszes") ? date("Y-m") : $valasztottHonap;
+    $edzesNapok = getEdzesNapokHonap($conn, $profilUser["id"], $honapNaptarhoz, $valasztottTervId, $valasztottTervNev);
     if ($sajatProfil && $bejelentkezve) {
         $baratok = getBaratok($conn, $userId);
     } else {
@@ -52,18 +66,33 @@ if ($profilUser) {
 
 $nemSzoveg = ["ferfi" => "Férfi", "no" => "Nő", "mas" => "Egyéb"];
 
-// Lapozó URL-ek
-$urlBase = "profil.php";
-if ($megtekintettId > 0) $urlBase .= "?user_id=" . $megtekintettId;
-$urlSep = ($megtekintettId > 0) ? "&" : "?";
-$honapPrevTs = strtotime($valasztottHonap . "-01 -1 month");
-$honapNextTs = strtotime($valasztottHonap . "-01 +1 month");
+// Lapozó URL-ek és szűrők
+$urlParams = [];
+if ($megtekintettId > 0) $urlParams["user_id"] = $megtekintettId;
+$honapNaptarhoz = ($valasztottHonap === "osszes") ? date("Y-m") : $valasztottHonap;
+$honapPrevTs = strtotime($honapNaptarhoz . "-01 -1 month");
+$honapNextTs = strtotime($honapNaptarhoz . "-01 +1 month");
 $honapPrev = date("Y-m", $honapPrevTs);
 $honapNext = date("Y-m", $honapNextTs);
 $maHonap = date("Y-m");
-$vanElozo = ($honapPrev <= $maHonap);  // elozo honap mindig van
-$vanKovetkezo = ($honapNext <= $maHonap);  // kovetkezo only if not future
-$naptarHonapSzoveg = date("Y", strtotime($valasztottHonap . "-01")) . ". " . $honapNevek[(int)date("n", strtotime($valasztottHonap . "-01"))];
+$vanElozo = ($honapPrev <= $maHonap);
+$vanKovetkezo = ($honapNext <= $maHonap);
+$naptarHonapSzoveg = ($valasztottHonap === "osszes") 
+    ? (date("Y", strtotime($honapNaptarhoz . "-01")) . ". " . $honapNevek[(int)date("n", strtotime($honapNaptarhoz . "-01"))])
+    : (date("Y", strtotime($valasztottHonap . "-01")) . ". " . $honapNevek[(int)date("n", strtotime($valasztottHonap . "-01"))]);
+$tervek = $tervekLista;
+$edzesHonapok = $profilUser ? getEdzesHonapok($conn, $profilUser["id"], $valasztottTervId, $valasztottTervNev ?? null, 24) : [];
+if ($valasztottHonap && $valasztottHonap !== "osszes" && !in_array($valasztottHonap, $edzesHonapok)) {
+    array_unshift($edzesHonapok, $valasztottHonap);
+}
+$baseUrlParams = $urlParams;
+if ($valasztottHonap) $baseUrlParams["honap"] = $valasztottHonap;
+if ($valasztottTervId) $baseUrlParams["terv"] = $valasztottTervId;
+function profilUrl($params, $overrides = []) {
+    $p = array_merge($params, $overrides);
+    foreach ($p as $k => $v) { if ($v === null || $v === "") unset($p[$k]); }
+    return "profil.php" . (empty($p) ? "" : "?" . http_build_query($p));
+}
 ?>
 <!DOCTYPE html>
 <html lang="hu">
@@ -159,19 +188,19 @@ $naptarHonapSzoveg = date("Y", strtotime($valasztottHonap . "-01")) . ". " . $ho
             <div class="profil-card profil-naptar">
                 <h2>Edzés napjai</h2>
                 <div class="naptar-lapozo">
-                    <?php if ($vanElozo): ?><a href="<?php echo $urlBase . $urlSep . "honap=" . $honapPrev; ?>" class="naptar-gomb" title="Előző hónap">←</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">←</span><?php endif; ?>
+                    <?php if ($vanElozo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapPrev])); ?>" class="naptar-gomb" title="Előző hónap">←</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">←</span><?php endif; ?>
                     <p class="naptar-honap"><?php echo htmlspecialchars($naptarHonapSzoveg); ?></p>
-                    <?php if ($vanKovetkezo): ?><a href="<?php echo $urlBase . $urlSep . "honap=" . $honapNext; ?>" class="naptar-gomb" title="Következő hónap">→</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">→</span><?php endif; ?>
+                    <?php if ($vanKovetkezo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapNext])); ?>" class="naptar-gomb" title="Következő hónap">→</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">→</span><?php endif; ?>
                 </div>
                 <div class="naptar-grid">
                     <?php
-                    $honapStartTs = strtotime($valasztottHonap . "-01");
+                    $honapStartTs = strtotime($honapNaptarhoz . "-01");
                     $napokSzama = date("t", $honapStartTs);
                     for ($i = 1; $i <= $napokSzama; $i++):
                         $d = date("Y-m-d", mktime(0,0,0, (int)date("n", $honapStartTs), $i, (int)date("Y", $honapStartTs)));
                         $van = in_array($d, $edzesNapok);
                     ?>
-                    <div class="naptar-nap <?php echo $van ? "edzett" : ""; ?>" title="<?php echo $van ? "Edzett ezen a napon" : ""; ?>"><?php echo $i; ?></div>
+                    <div class="naptar-nap <?php echo $van ? "edzett" : ""; ?>" data-datum="<?php echo htmlspecialchars($d); ?>" data-klikkelheto="<?php echo $van ? "1" : "0"; ?>" title="<?php echo $van ? "Edzett ezen a napon – kattints a részletekért" : ""; ?>"><?php echo $i; ?></div>
                     <?php endfor; ?>
                 </div>
                 <p class="naptar-jelmagy">A kitöltött napok az edzéseket jelölik.</p>
@@ -179,16 +208,43 @@ $naptarHonapSzoveg = date("Y", strtotime($valasztottHonap . "-01")) . ". " . $ho
             </div>
 
             <div class="profil-card profil-edzesek profil-edzesek-fo">
-                <h2>Edzéseim – <?php echo htmlspecialchars($naptarHonapSzoveg); ?></h2>
+                <h2>Edzéseim<?php echo $valasztottHonap !== "osszes" ? " – " . htmlspecialchars($naptarHonapSzoveg) : ""; ?></h2>
+                <div class="edzes-szurok">
+                    <div class="szuro-csoport">
+                        <label class="szuro-cimke" for="szuro-honap">Hónap:</label>
+                        <select id="szuro-honap" class="szuro-select" onchange="location.href=this.value">
+                            <option value="<?php echo htmlspecialchars(profilUrl($urlParams, ["honap" => "osszes"] + ($valasztottTervId ? ["terv" => $valasztottTervId] : []))); ?>" <?php echo $valasztottHonap === "osszes" ? "selected" : ""; ?>>Összes</option>
+                            <?php foreach ($edzesHonapok as $ym): 
+                                $honapSzoveg = date("Y", strtotime($ym . "-01")) . ". " . $honapNevek[(int)date("n", strtotime($ym . "-01"))];
+                                $linkUrl = profilUrl($urlParams, ["honap" => $ym] + ($valasztottTervId ? ["terv" => $valasztottTervId] : []));
+                            ?>
+                            <option value="<?php echo htmlspecialchars($linkUrl); ?>" <?php echo $valasztottHonap === $ym ? "selected" : ""; ?>><?php echo htmlspecialchars($honapSzoveg); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php if (!empty($tervek)): ?>
+                    <div class="szuro-csoport">
+                        <label class="szuro-cimke" for="szuro-terv">Terv:</label>
+                        <select id="szuro-terv" class="szuro-select" onchange="location.href=this.value">
+                            <option value="<?php echo htmlspecialchars(profilUrl($urlParams, ($valasztottHonap && $valasztottHonap !== "osszes" ? ["honap" => $valasztottHonap] : ["honap" => "osszes"]))); ?>">Összes</option>
+                            <?php foreach ($tervek as $t): 
+                                $linkUrl = profilUrl($urlParams, ["terv" => $t["id"]] + ($valasztottHonap && $valasztottHonap !== "osszes" ? ["honap" => $valasztottHonap] : ["honap" => "osszes"]));
+                            ?>
+                            <option value="<?php echo htmlspecialchars($linkUrl); ?>" <?php echo $valasztottTervId === (int)$t["id"] ? "selected" : ""; ?>><?php echo htmlspecialchars($t["nev"]); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+                </div>
                 <?php if (empty($edzesek)): ?>
-                    <p class="ures-hint">Még nincs befejezett edzésed.</p>
+                    <p class="ures-hint"><?php echo $valasztottTervId ? "Nincs befejezett edzésed ebben a tervben. Indíts egy edzést a tervből, fejezd be, majd itt megjelenik." : "Még nincs befejezett edzésed."; ?></p>
                 <?php else: ?>
                     <ul class="edzes-lista">
                         <?php foreach ($edzesek as $e): ?>
                         <li>
                             <a href="edzes_reszletek.php?id=<?php echo (int)$e["id"]; ?>">
                                 <span class="edzes-nev"><?php echo htmlspecialchars($e["nev"]); ?></span>
-                                <span class="edzes-meta"><?php echo htmlspecialchars($e["datum"]); ?> • <?php echo gmdate("H:i", (int)$e["idotartam"]); ?> • <?php echo (int)$e["osszsuly"]; ?> kg</span>
+                                <span class="edzes-meta"><?php echo htmlspecialchars($e["datum"]); ?> • <?php echo gmdate("H:i:s", (int)$e["idotartam"]); ?> • <?php echo (int)$e["osszsuly"]; ?> kg</span>
                             </a>
                         </li>
                         <?php endforeach; ?>
@@ -199,7 +255,21 @@ $naptarHonapSzoveg = date("Y", strtotime($valasztottHonap . "-01")) . ". " . $ho
             <?php else: ?>
             <div class="profil-tartalom-grid">
             <div class="profil-card profil-edzesek profil-edzesek-fo">
-                <h2>Edzései – <?php echo htmlspecialchars($naptarHonapSzoveg); ?></h2>
+                <h2>Edzései<?php echo $valasztottHonap !== "osszes" ? " – " . htmlspecialchars($naptarHonapSzoveg) : ""; ?></h2>
+                <div class="edzes-szurok">
+                    <div class="szuro-csoport">
+                        <label class="szuro-cimke" for="szuro-honap-mas">Hónap:</label>
+                        <select id="szuro-honap-mas" class="szuro-select" onchange="location.href=this.value">
+                            <option value="<?php echo htmlspecialchars(profilUrl($urlParams, ["honap" => "osszes"])); ?>" <?php echo $valasztottHonap === "osszes" ? "selected" : ""; ?>>Összes</option>
+                            <?php foreach ($edzesHonapok as $ym): 
+                                $honapSzoveg = date("Y", strtotime($ym . "-01")) . ". " . $honapNevek[(int)date("n", strtotime($ym . "-01"))];
+                                $linkUrl = profilUrl($urlParams, ["honap" => $ym]);
+                            ?>
+                            <option value="<?php echo htmlspecialchars($linkUrl); ?>" <?php echo $valasztottHonap === $ym ? "selected" : ""; ?>><?php echo htmlspecialchars($honapSzoveg); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
                 <?php if (empty($edzesek)): ?>
                     <p class="ures-hint">Még nincs befejezett edzése.</p>
                 <?php else: ?>
@@ -208,7 +278,7 @@ $naptarHonapSzoveg = date("Y", strtotime($valasztottHonap . "-01")) . ". " . $ho
                         <li>
                             <a href="edzes_reszletek.php?id=<?php echo (int)$e["id"]; ?>">
                                 <span class="edzes-nev"><?php echo htmlspecialchars($e["nev"]); ?></span>
-                                <span class="edzes-meta"><?php echo htmlspecialchars($e["datum"]); ?> • <?php echo gmdate("H:i", (int)$e["idotartam"]); ?> • <?php echo (int)$e["osszsuly"]; ?> kg</span>
+                                <span class="edzes-meta"><?php echo htmlspecialchars($e["datum"]); ?> • <?php echo gmdate("H:i:s", (int)$e["idotartam"]); ?> • <?php echo (int)$e["osszsuly"]; ?> kg</span>
                             </a>
                         </li>
                         <?php endforeach; ?>
@@ -219,19 +289,19 @@ $naptarHonapSzoveg = date("Y", strtotime($valasztottHonap . "-01")) . ". " . $ho
             <div class="profil-card profil-naptar">
                 <h2>Edzés napjai</h2>
                 <div class="naptar-lapozo">
-                    <?php if ($vanElozo): ?><a href="<?php echo $urlBase . $urlSep . "honap=" . $honapPrev; ?>" class="naptar-gomb" title="Előző hónap">←</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">←</span><?php endif; ?>
+                    <?php if ($vanElozo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapPrev])); ?>" class="naptar-gomb" title="Előző hónap">←</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">←</span><?php endif; ?>
                     <p class="naptar-honap"><?php echo htmlspecialchars($naptarHonapSzoveg); ?></p>
-                    <?php if ($vanKovetkezo): ?><a href="<?php echo $urlBase . $urlSep . "honap=" . $honapNext; ?>" class="naptar-gomb" title="Következő hónap">→</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">→</span><?php endif; ?>
+                    <?php if ($vanKovetkezo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapNext])); ?>" class="naptar-gomb" title="Következő hónap">→</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">→</span><?php endif; ?>
                 </div>
                 <div class="naptar-grid">
                     <?php
-                    $honapStartTsMas = strtotime($valasztottHonap . "-01");
+                    $honapStartTsMas = strtotime($honapNaptarhoz . "-01");
                     $napokSzamaMas = date("t", $honapStartTsMas);
                     for ($i = 1; $i <= $napokSzamaMas; $i++):
                         $d = date("Y-m-d", mktime(0,0,0, (int)date("n", $honapStartTsMas), $i, (int)date("Y", $honapStartTsMas)));
                         $van = in_array($d, $edzesNapok);
                     ?>
-                    <div class="naptar-nap <?php echo $van ? "edzett" : ""; ?>" title="<?php echo $van ? "Edzett ezen a napon" : ""; ?>"><?php echo $i; ?></div>
+                    <div class="naptar-nap <?php echo $van ? "edzett" : ""; ?>" data-datum="<?php echo htmlspecialchars($d); ?>" data-klikkelheto="<?php echo $van ? "1" : "0"; ?>" title="<?php echo $van ? "Edzett ezen a napon – kattints a részletekért" : ""; ?>"><?php echo $i; ?></div>
                     <?php endfor; ?>
                 </div>
                 <p class="naptar-jelmagy">A kitöltött napok az edzéseket jelölik.</p>
@@ -308,11 +378,76 @@ $naptarHonapSzoveg = date("Y", strtotime($valasztottHonap . "-01")) . ". " . $ho
 <?php endif; ?>
 <?php endif; ?>
 
+<?php if ($profilUser): ?>
+<div id="naptarEdzesPopup" class="popup-overlay naptar-popup">
+    <div class="popup-naptar-edzes">
+        <button type="button" class="popup-close" aria-label="Bezárás">×</button>
+        <h3 id="naptarPopupCim">Edzések</h3>
+        <div id="naptarPopupTartalom"></div>
+    </div>
+</div>
+<?php endif; ?>
+
 <?php if (!$sajatProfil && $bejelentkezve): ?>
 <script src="../js/profil.js" defer></script>
 <?php endif; ?>
 <?php if ($sajatProfil && $bejelentkezve): ?>
 <script src="../js/profil_sajat.js" defer></script>
+<?php endif; ?>
+<?php if ($profilUser): ?>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const napok = document.querySelectorAll(".naptar-nap[data-klikkelheto='1']");
+    const popup = document.getElementById("naptarEdzesPopup");
+    const popupCim = document.getElementById("naptarPopupCim");
+    const popupTartalom = document.getElementById("naptarPopupTartalom");
+    const closeBtn = popup?.querySelector(".popup-close");
+    const urlParams = new URLSearchParams(window.location.search);
+    const userIdParam = urlParams.get("user_id") || "";
+    const tervParam = urlParams.get("terv") || "";
+
+    napok.forEach((nap) => {
+        nap.style.cursor = "pointer";
+        nap.addEventListener("click", async () => {
+            const datum = nap.getAttribute("data-datum");
+            if (!datum || !popup || !popupTartalom) return;
+            let apiUrl = "profil_nap_edzesek.php?datum=" + encodeURIComponent(datum);
+            if (userIdParam) apiUrl += "&user_id=" + encodeURIComponent(userIdParam);
+            if (tervParam) apiUrl += "&terv=" + encodeURIComponent(tervParam);
+            popupTartalom.innerHTML = "<p>Betöltés...</p>";
+            popupCim.textContent = "Edzések – " + datum;
+            popup.classList.add("open");
+            try {
+                const res = await fetch(apiUrl);
+                const data = await res.json();
+                if (data.siker && Array.isArray(data.edzesek)) {
+                    if (data.edzesek.length === 0) {
+                        popupTartalom.innerHTML = "<p class='ures-hint'>Nincs edzés ezen a napon.</p>";
+                    } else {
+                        popupTartalom.innerHTML = "<ul class='naptar-popup-lista'>" +
+                            data.edzesek.map(e => "<li><a href='edzes_reszletek.php?id=" + e.id + "'>" +
+                                "<span class='edzes-nev'>" + (e.nev || "").replace(/</g, "&lt;") + "</span>" +
+                                "<span class='edzes-meta'>" + (e.datum || "") + " • " + (e.idotartam ? (Math.floor(e.idotartam/3600) + ":" + String(Math.floor((e.idotartam%3600)/60)).padStart(2,"0") + ":" + String(e.idotartam%60).padStart(2,"0")) : "0:00:00") + " • " + (e.osszsuly || 0) + " kg</span>" +
+                                "</a></li>").join("") + "</ul>";
+                    }
+                } else {
+                    popupTartalom.innerHTML = "<p class='ures-hint'>Hiba a betöltésnél.</p>";
+                }
+            } catch (e) {
+                popupTartalom.innerHTML = "<p class='ures-hint'>Nem sikerült betölteni.</p>";
+            }
+        });
+    });
+
+    if (closeBtn && popup) {
+        closeBtn.addEventListener("click", () => popup.classList.remove("open"));
+    }
+    if (popup) {
+        popup.addEventListener("click", (e) => { if (e.target === popup) popup.classList.remove("open"); });
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape" && popup.classList.contains("open")) popup.classList.remove("open"); });
+    }
+});
+</script>
 <?php endif; ?>
 </body>
 </html>

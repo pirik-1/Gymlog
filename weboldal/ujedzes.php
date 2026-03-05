@@ -26,6 +26,7 @@ if (isset($_GET["terv_id"]) && is_numeric($_GET["terv_id"])) {
     <?php if ($tervAdatok): ?>
     <script>
         window.tervAdatok = <?php echo json_encode($tervAdatok, JSON_UNESCAPED_UNICODE); ?>;
+        window.tervId = <?php echo (int)$tervId; ?>;
     </script>
     <?php endif; ?>
     <script>
