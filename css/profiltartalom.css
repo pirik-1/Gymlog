@@ -8,23 +8,14 @@
 
 .profil-shell{
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 24px;
+    grid-template-columns: 1fr;
+    gap: 20px;
     box-sizing: border-box;
     background: transparent;
 }
 
-.profil-fo{
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 0;
-    overflow: visible;
-}
-
-.profil-oldal{
-    display: flex;
-    align-items: flex-start;
+.profil-fejezet-span {
+    grid-column: 1 / -1;
 }
 
 /* Fejléc – név + statok egymás mellett */
@@ -53,10 +44,10 @@
     margin-right: 4px;
 }
 
-/* Fő tartalom grid: Edzések | Mellék (adatok, kalk, naptár) */
+/* Fő tartalom grid: Mellék (gombok, naptár) | Edzések | Barátok – mind egy vonalban */
 .profil-tartalom-grid {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 280px 1fr 280px;
     gap: 20px;
     align-items: start;
     overflow: visible;
@@ -66,17 +57,37 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(85, 107, 47, 0.6) rgba(0, 0, 0, 0.08);
 }
+.profil-mellék::-webkit-scrollbar { width: 8px; }
+.profil-mellék::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.08); border-radius: 4px; }
+.profil-mellék::-webkit-scrollbar-thumb { background: rgba(85, 107, 47, 0.5); border-radius: 4px; }
+.profil-mellék::-webkit-scrollbar-thumb:hover { background: rgba(85, 107, 47, 0.7); }
 
 .profil-edzesek-fo {
     min-height: 200px;
-    overflow: visible;
-    padding-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 220px);
+    overflow: hidden;
 }
+.profil-edzesek-fo .edzes-szurok { flex-shrink: 0; }
+.profil-edzesek-fo .edzes-lista {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(85, 107, 47, 0.6) rgba(0, 0, 0, 0.08);
+}
+.profil-edzesek-fo .edzes-lista::-webkit-scrollbar { width: 8px; }
+.profil-edzesek-fo .edzes-lista::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.08); border-radius: 4px; }
+.profil-edzesek-fo .edzes-lista::-webkit-scrollbar-thumb { background: rgba(85, 107, 47, 0.5); border-radius: 4px; }
+.profil-edzesek-fo .edzes-lista::-webkit-scrollbar-thumb:hover { background: rgba(85, 107, 47, 0.7); }
 
 @media (max-width: 900px) {
-    .profil-fo { margin-top: 0; }
-    .profil-shell { grid-template-columns: 1fr; }
     .profil-tartalom-grid { grid-template-columns: 1fr; }
 }
 
@@ -217,13 +228,27 @@
 
 .profil-friends{
     width: 100%;
+    max-height: calc(100vh - 220px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
+.profil-friends h2 { flex-shrink: 0; }
 .friends-list{
     list-style: none;
     padding: 0;
     margin: 0 0 10px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(85, 107, 47, 0.6) rgba(0, 0, 0, 0.08);
 }
+.friends-list::-webkit-scrollbar { width: 8px; }
+.friends-list::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.08); border-radius: 4px; }
+.friends-list::-webkit-scrollbar-thumb { background: rgba(85, 107, 47, 0.5); border-radius: 4px; }
+.friends-list::-webkit-scrollbar-thumb:hover { background: rgba(85, 107, 47, 0.7); }
 
 .friends-list li{
     padding: 6px 0;
@@ -241,8 +266,9 @@
     margin: 0;
 }
 
-/* Személyes adatok űrlap */
-.profil-adatok .privát-hint { font-size: 11px; opacity: 0.7; font-weight: normal; }
+/* Személyes adatok űrlap (popupban) */
+.profil-adatok-form .privát-hint,
+.popup-kalkulator .privát-hint { font-size: 11px; opacity: 0.7; font-weight: normal; }
 .profil-adatok-form .form-sor { margin-bottom: 10px; }
 .profil-adatok-form label { display: block; font-size: 13px; margin-bottom: 3px; }
 .profil-adatok-form input,
@@ -294,8 +320,13 @@
 }
 .profil-adatok-form .form-uzenet { font-size: 12px; margin-top: 6px; }
 
-/* Kalória kalkulátor gomb */
-.kaloria-kalkulator-gomb {
+/* Személyes adatok + Kalória kalkulátor gombok egymás mellett */
+.profil-gombok-sor {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.profil-mellék-gomb {
     font-weight: bold;
     padding: 12px 20px;
     border-radius: 20px;
@@ -304,15 +335,16 @@
     color: white;
     cursor: pointer;
     font-size: 15px;
-    width: 100%;
+    flex: 1;
+    min-width: 140px;
     transition: all 0.3s ease;
 }
-.kaloria-kalkulator-gomb:hover { 
+.profil-mellék-gomb:hover { 
     background: rgb(85, 107, 47);     
     transform: translateY(-1px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.25);
 }
-.kaloria-kalkulator-gomb:active {
+.profil-mellék-gomb:active {
     transform: translateY(0);
     box-shadow: none;
 }
@@ -468,9 +500,10 @@
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: opacity 0.2s, visibility 0.2s;
 }
-.popup-overlay.open { opacity: 1; visibility: visible; }
+.popup-overlay.open { opacity: 1; visibility: visible; pointer-events: auto; }
 .popup-kalkulator {
     background-color: rgb(226,232,206);
     border-radius: 20px;

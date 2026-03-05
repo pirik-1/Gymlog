@@ -26,6 +26,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const adatokPopup = document.getElementById("adatokPopup");
+    const adatokGomb = document.getElementById("szemelyesAdatokGomb");
+    if (adatokGomb && adatokPopup) {
+        adatokGomb.addEventListener("click", (e) => {
+            e.preventDefault();
+            adatokPopup.classList.add("open");
+        });
+        const adatokClose = adatokPopup.querySelector(".popup-close");
+        if (adatokClose) adatokClose.addEventListener("click", () => { adatokPopup.classList.remove("open"); });
+        adatokPopup.addEventListener("click", (e) => { if (e.target === adatokPopup) adatokPopup.classList.remove("open"); });
+    }
+
     const popup = document.getElementById("kaloriaPopup");
     const kalkGomb = document.getElementById("kaloriaKalkulatorGomb");
     const popupClose = popup?.querySelector(".popup-close");
@@ -43,7 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (e.target === popup) popup.classList.remove("open");
         });
         document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && popup.classList.contains("open")) popup.classList.remove("open");
+            if (e.key !== "Escape") return;
+            if (popup?.classList.contains("open")) popup.classList.remove("open");
+            if (adatokPopup?.classList.contains("open")) adatokPopup.classList.remove("open");
         });
     }
 

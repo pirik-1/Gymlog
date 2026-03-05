@@ -30,6 +30,9 @@ if (isset($_SESSION["user_id"])) {
         <div class="outer-box">
             <section class="posts-box">
                 <h1>Bejegyzések</h1>
+                <div class="posts-search-row">
+                    <input type="search" id="bejegyzesKereso" class="bejegyzes-kereso" placeholder="Keresés a bejegyzések között..." autocomplete="off" aria-label="Keresés">
+                </div>
                 <?php if (isset($_SESSION["user_id"])): ?>
                 <div class="posts-szuro">
                     <span>Mutasd:</span>
@@ -42,8 +45,9 @@ if (isset($_SESSION["user_id"])) {
                         Itt fognak megjelenni a barátaid és a saját posztjaid. Befejezz egy edzést az „Új edzés” oldalon, és megjelenik itt!
                     </p>
                 <?php else: ?>
+                    <p id="bejegyzesNincsEredmeny" class="posts-placeholder" style="display:none;">Nincs találat a keresésre.</p>
                     <?php foreach ($posztok as $poszt): ?>
-                        <article class="poszt-kartya <?php echo !empty($poszt["edzesId"]) ? 'poszt-kattinthato' : ''; ?>">
+                        <article class="poszt-kartya <?php echo !empty($poszt["edzesId"]) ? 'poszt-kattinthato' : ''; ?>" data-kereso-szoveg="<?php echo htmlspecialchars(mb_strtolower($poszt["tartalom"] . " " . ($poszt["felhasznaloNev"] ?? ""))); ?>">
                             <?php 
                                 $suffix = " befejezett egy edzést: ";
                                 $tartalom = $poszt["tartalom"];

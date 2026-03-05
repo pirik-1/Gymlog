@@ -131,66 +131,43 @@ function profilUrl($params, $overrides = []) {
 <?php else: ?>
 <main class="profil-main">
     <div class="profil-shell">
-        <section class="profil-fo">
-            <div class="profil-card profil-fejezet">
-                <div class="fej-sor">
-                    <div class="fej-bal">
-                        <h1 class="profil-nev-sor">
-                            <?php echo htmlspecialchars($profilUser["nev"]); ?>
-                            <?php if (!empty($profilUser["nem"]) && $profilUser["nem"] === "no"): ?>
-                                <span class="nem-ikon nem-no" title="Nő">♀</span>
-                            <?php elseif (!empty($profilUser["nem"]) && $profilUser["nem"] === "ferfi"): ?>
-                                <span class="nem-ikon nem-ferfi" title="Férfi">♂</span>
-                            <?php endif; ?>
-                        </h1>
-                        <?php if (!$sajatProfil): ?>
-                            <a href="kozosseg.php" class="vissza-kozosseg">← Vissza a közösséghez</a>
-                            <p id="baratAllapotUzenet"></p>
-                            <?php if ($baratsagAllapot === null): ?>
-                                <button type="button" id="baratJonelolGomb" class="barat-jonelol-gomb" data-user-id="<?php echo (int)$profilUser["id"]; ?>">Barátnak jelölés</button>
-                            <?php elseif ($baratsagAllapot["status"] === "pending"): ?>
-                                <p class="barat-status"><?php echo (int)$baratsagAllapot["kero_id"] === $userId ? "Baráti kérés küldve." : "Fogadd el a Közösség oldalon."; ?></p>
-                            <?php else: ?>
-                                <p class="barat-status">Már barátok vagytok.</p>
-                            <?php endif; ?>
+        <div class="profil-card profil-fejezet profil-fejezet-span">
+            <div class="fej-sor">
+                <div class="fej-bal">
+                    <h1 class="profil-nev-sor">
+                        <?php echo htmlspecialchars($profilUser["nev"]); ?>
+                        <?php if (!empty($profilUser["nem"]) && $profilUser["nem"] === "no"): ?>
+                            <span class="nem-ikon nem-no" title="Nő">♀</span>
+                        <?php elseif (!empty($profilUser["nem"]) && $profilUser["nem"] === "ferfi"): ?>
+                            <span class="nem-ikon nem-ferfi" title="Férfi">♂</span>
                         <?php endif; ?>
-                    </div>
-                    <div class="fej-statok">
-                        <div class="stat-chip"><span class="stat-szam"><?php echo $edzesDb; ?></span> edzés</div>
-                        <div class="stat-chip"><span class="stat-szam"><?php echo $baratDb; ?></span> barát</div>
-                    </div>
+                    </h1>
+                    <?php if (!$sajatProfil): ?>
+                        <a href="kozosseg.php" class="vissza-kozosseg">← Vissza a közösséghez</a>
+                        <p id="baratAllapotUzenet"></p>
+                        <?php if ($baratsagAllapot === null): ?>
+                            <button type="button" id="baratJonelolGomb" class="barat-jonelol-gomb" data-user-id="<?php echo (int)$profilUser["id"]; ?>">Barátnak jelölés</button>
+                        <?php elseif ($baratsagAllapot["status"] === "pending"): ?>
+                            <p class="barat-status"><?php echo (int)$baratsagAllapot["kero_id"] === $userId ? "Baráti kérés küldve." : "Fogadd el a Közösség oldalon."; ?></p>
+                        <?php else: ?>
+                            <p class="barat-status">Már barátok vagytok.</p>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+                <div class="fej-statok">
+                    <div class="stat-chip"><span class="stat-szam"><?php echo $edzesDb; ?></span> edzés</div>
+                    <div class="stat-chip"><span class="stat-szam"><?php echo $baratDb; ?></span> barát</div>
                 </div>
             </div>
+        </div>
 
-            <?php if ($sajatProfil): ?>
+        <?php if ($sajatProfil): ?>
             <div class="profil-tartalom-grid">
             <div class="profil-mellék">
-            <div class="profil-card profil-adatok">
-                <h2>Személyes adatok <span class="privát-hint">(csak neked látható)</span></h2>
-                <div class="profil-adatok-form">
-                    <div class="form-sor">
-                        <label>Magasság (cm)</label>
-                        <input type="number" id="magassagInput" min="50" max="250" placeholder="pl. 175" value="<?php echo $profilUser["magassag"] ? (int)$profilUser["magassag"] : ""; ?>">
-                    </div>
-                    <div class="form-sor">
-                        <label>Testsúly (kg)</label>
-                        <input type="number" id="testsulyInput" min="20" max="300" placeholder="pl. 75" value="<?php echo $profilUser["testsuly"] ? (int)$profilUser["testsuly"] : ""; ?>">
-                    </div>
-                    <div class="form-sor">
-                        <label>Nem</label>
-                        <select id="nemSelect">
-                            <option value="">—</option>
-                            <option value="ferfi" <?php echo ($profilUser["nem"] ?? "") === "ferfi" ? "selected" : ""; ?>>Férfi</option>
-                            <option value="no" <?php echo ($profilUser["nem"] ?? "") === "no" ? "selected" : ""; ?>>Nő</option>
-                            <option value="mas" <?php echo ($profilUser["nem"] ?? "") === "mas" ? "selected" : ""; ?>>Egyéb</option>
-                        </select>
-                    </div>
-                    <button type="button" id="adatokMentes" class="mentes-gomb-kicsi">Mentés</button>
-                    <p id="adatokUzenet" class="form-uzenet"></p>
-                </div>
+            <div class="profil-gombok-sor">
+                <button type="button" id="szemelyesAdatokGomb" class="profil-mellék-gomb">Személyes adatok</button>
+                <button type="button" id="kaloriaKalkulatorGomb" class="profil-mellék-gomb">Kalória kalkulátor</button>
             </div>
-
-            <button type="button" id="kaloriaKalkulatorGomb" class="kaloria-kalkulator-gomb">Kalória kalkulátor</button>
 
             <div class="profil-card profil-naptar">
                 <h2>Edzés napjai</h2>
@@ -258,9 +235,42 @@ function profilUrl($params, $overrides = []) {
                     </ul>
                 <?php endif; ?>
             </div>
+            <div class="profil-card profil-friends">
+                <h2>Barátok</h2>
+                <ul class="friends-list">
+                    <?php foreach ($baratok as $b): ?>
+                        <li><a href="profil.php?user_id=<?php echo (int)$b["id"]; ?>"><?php echo htmlspecialchars($b["nev"]); ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php if (empty($baratok)): ?>
+                    <p class="friends-hint">Itt jelennek meg a barátaid. Jelöld barátnak másokat a Közösség oldalon.</p>
+                <?php endif; ?>
+            </div>
             </div>
             <?php else: ?>
             <div class="profil-tartalom-grid">
+            <div class="profil-mellék profil-mellék-mas">
+                <div class="profil-card profil-naptar">
+                <h2>Edzés napjai</h2>
+                <div class="naptar-lapozo">
+                    <?php if ($vanElozo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapPrev])); ?>" class="naptar-gomb" title="Előző hónap">←</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">←</span><?php endif; ?>
+                    <p class="naptar-honap"><?php echo htmlspecialchars($naptarHonapSzoveg); ?></p>
+                    <?php if ($vanKovetkezo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapNext])); ?>" class="naptar-gomb" title="Következő hónap">→</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">→</span><?php endif; ?>
+                </div>
+                <div class="naptar-grid">
+                    <?php
+                    $honapStartTsMas = strtotime($honapNaptarhoz . "-01");
+                    $napokSzamaMas = date("t", $honapStartTsMas);
+                    for ($i = 1; $i <= $napokSzamaMas; $i++):
+                        $d = date("Y-m-d", mktime(0,0,0, (int)date("n", $honapStartTsMas), $i, (int)date("Y", $honapStartTsMas)));
+                        $van = in_array($d, $edzesNapok);
+                    ?>
+                    <div class="naptar-nap <?php echo $van ? "edzett" : ""; ?>" data-datum="<?php echo htmlspecialchars($d); ?>" data-klikkelheto="<?php echo $van ? "1" : "0"; ?>" title="<?php echo $van ? "Edzett ezen a napon – kattints a részletekért" : ""; ?>"><?php echo $i; ?></div>
+                    <?php endfor; ?>
+                </div>
+                <p class="naptar-jelmagy">A kitöltött napok az edzéseket jelölik.</p>
+                </div>
+            </div>
             <div class="profil-card profil-edzesek profil-edzesek-fo">
                 <h2>Edzései<?php echo $valasztottHonap !== "osszes" ? " – " . htmlspecialchars($naptarHonapSzoveg) : ""; ?></h2>
                 <div class="edzes-szurok">
@@ -292,53 +302,43 @@ function profilUrl($params, $overrides = []) {
                     </ul>
                 <?php endif; ?>
             </div>
-            <div class="profil-mellék">
-            <div class="profil-card profil-naptar">
-                <h2>Edzés napjai</h2>
-                <div class="naptar-lapozo">
-                    <?php if ($vanElozo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapPrev])); ?>" class="naptar-gomb" title="Előző hónap">←</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">←</span><?php endif; ?>
-                    <p class="naptar-honap"><?php echo htmlspecialchars($naptarHonapSzoveg); ?></p>
-                    <?php if ($vanKovetkezo): ?><a href="<?php echo htmlspecialchars(profilUrl($baseUrlParams, ["honap" => $honapNext])); ?>" class="naptar-gomb" title="Következő hónap">→</a><?php else: ?><span class="naptar-gomb naptar-gomb-disabled">→</span><?php endif; ?>
-                </div>
-                <div class="naptar-grid">
-                    <?php
-                    $honapStartTsMas = strtotime($honapNaptarhoz . "-01");
-                    $napokSzamaMas = date("t", $honapStartTsMas);
-                    for ($i = 1; $i <= $napokSzamaMas; $i++):
-                        $d = date("Y-m-d", mktime(0,0,0, (int)date("n", $honapStartTsMas), $i, (int)date("Y", $honapStartTsMas)));
-                        $van = in_array($d, $edzesNapok);
-                    ?>
-                    <div class="naptar-nap <?php echo $van ? "edzett" : ""; ?>" data-datum="<?php echo htmlspecialchars($d); ?>" data-klikkelheto="<?php echo $van ? "1" : "0"; ?>" title="<?php echo $van ? "Edzett ezen a napon – kattints a részletekért" : ""; ?>"><?php echo $i; ?></div>
-                    <?php endfor; ?>
-                </div>
-                <p class="naptar-jelmagy">A kitöltött napok az edzéseket jelölik.</p>
-            </div>
+            <div class="profil-card profil-friends">
+                <h2>Barátok</h2>
+                <p class="friends-hint">A barátok listája csak a saját profilban látható.</p>
             </div>
             </div>
             <?php endif; ?>
-        </section>
-
-        <aside class="profil-oldal">
-            <div class="profil-card profil-friends">
-                <h2>Barátok</h2>
-                <?php if ($sajatProfil): ?>
-                    <ul class="friends-list">
-                        <?php foreach ($baratok as $b): ?>
-                            <li><a href="profil.php?user_id=<?php echo (int)$b["id"]; ?>"><?php echo htmlspecialchars($b["nev"]); ?></a></li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php if (empty($baratok)): ?>
-                        <p class="friends-hint">Itt jelennek meg a barátaid. Jelöld barátnak másokat a Közösség oldalon.</p>
-                    <?php endif; ?>
-                <?php else: ?>
-                    <p class="friends-hint">A barátok listája csak a saját profilban látható.</p>
-                <?php endif; ?>
-            </div>
-        </aside>
     </div>
 </main>
 
 <?php if ($sajatProfil): ?>
+<div id="adatokPopup" class="popup-overlay">
+    <div class="popup-kalkulator">
+        <button type="button" class="popup-close" aria-label="Bezárás">×</button>
+        <h2>Személyes adatok <span class="privát-hint">(csak neked látható)</span></h2>
+        <div class="profil-adatok-form">
+            <div class="form-sor">
+                <label>Magasság (cm)</label>
+                <input type="number" id="magassagInput" min="50" max="250" placeholder="pl. 175" value="<?php echo $profilUser["magassag"] ? (int)$profilUser["magassag"] : ""; ?>">
+            </div>
+            <div class="form-sor">
+                <label>Testsúly (kg)</label>
+                <input type="number" id="testsulyInput" min="20" max="300" placeholder="pl. 75" value="<?php echo $profilUser["testsuly"] ? (int)$profilUser["testsuly"] : ""; ?>">
+            </div>
+            <div class="form-sor">
+                <label>Nem</label>
+                <select id="nemSelect">
+                    <option value="">—</option>
+                    <option value="ferfi" <?php echo ($profilUser["nem"] ?? "") === "ferfi" ? "selected" : ""; ?>>Férfi</option>
+                    <option value="no" <?php echo ($profilUser["nem"] ?? "") === "no" ? "selected" : ""; ?>>Nő</option>
+                    <option value="mas" <?php echo ($profilUser["nem"] ?? "") === "mas" ? "selected" : ""; ?>>Egyéb</option>
+                </select>
+            </div>
+            <button type="button" id="adatokMentes" class="mentes-gomb-kicsi">Mentés</button>
+            <p id="adatokUzenet" class="form-uzenet"></p>
+        </div>
+    </div>
+</div>
 <div id="kaloriaPopup" class="popup-overlay">
     <div class="popup-kalkulator">
         <button type="button" class="popup-close" aria-label="Bezárás">×</button>

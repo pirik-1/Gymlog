@@ -2,6 +2,24 @@ const navToggle = document.getElementById("navToggle");
 const navMenu = document.getElementById("navMenu");
 const navBackdrop = document.getElementById("navBackdrop");
 
+/* Bejegyzések keresése a főoldalon */
+const bejegyzesKereso = document.getElementById("bejegyzesKereso");
+if (bejegyzesKereso) {
+    const kartyak = document.querySelectorAll(".poszt-kartya[data-kereso-szoveg]");
+    const nincsEredmeny = document.getElementById("bejegyzesNincsEredmeny");
+    bejegyzesKereso.addEventListener("input", () => {
+        const keres = (bejegyzesKereso.value || "").trim().toLowerCase();
+        let lathato = 0;
+        kartyak.forEach(kartya => {
+            const szoveg = (kartya.dataset.keresoSzoveg || "").toLowerCase();
+            const egyezik = !keres || szoveg.includes(keres);
+            kartya.style.display = egyezik ? "" : "none";
+            if (egyezik) lathato++;
+        });
+        if (nincsEredmeny) nincsEredmeny.style.display = (keres && lathato === 0) ? "block" : "none";
+    });
+}
+
 if (navToggle && navMenu) {
     function nyitMenut() {
         navMenu.classList.add("nav-open");
